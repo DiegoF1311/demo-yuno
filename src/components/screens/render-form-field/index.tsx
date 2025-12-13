@@ -1,711 +1,955 @@
-'use client'
-
-import { ChangeEvent, useRef, useState } from 'react'
-
-import { FormFieldType } from '@/types'
-import { cn } from '@/lib/utils'
-
-import {
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Input } from '@/components/ui/input'
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
-} from '@/components/ui/input-otp'
+import React, { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
-import { Textarea } from '@/components/ui/textarea'
-import { Calendar } from '@/components/ui/calendar'
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-  CommandList,
-} from '@/components/ui/command'
+} from "@/components/ui/command";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
-import { Button } from '@/components/ui/button'
-import { format } from 'date-fns'
-import { PasswordInput } from '@/components/ui/password-input'
-import { PhoneInput } from '@/components/ui/phone-input'
-import {
-  FileUploader,
-  FileUploaderContent,
-  FileUploaderItem,
-  FileInput,
-} from '@/components/ui/file-upload'
-import { Slider } from '@/components/ui/slider'
-import { CalendarIcon, Check, ChevronsUpDown, Paperclip } from 'lucide-react'
-import { TagsInput } from '@/components/ui/tags-input'
-import {
-  MultiSelector,
-  MultiSelectorContent,
-  MultiSelectorInput,
-  MultiSelectorItem,
-  MultiSelectorList,
-  MultiSelectorTrigger,
-} from '@/components/ui/multi-select'
-import { DatetimePicker } from '@/components/ui/datetime-picker'
-import { SmartDatetimeInput } from '@/components/ui/smart-datetime-input'
-import LocationSelector from '@/components/ui/location-input'
-import SignatureInput from '@/components/ui/signature-input'
-import SignaturePad from '@/components/ui/signature-pad'
-import { Rating } from '@/components/ui/rating'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { CreditCard, CreditCardValue } from '@/components/ui/credit-card'
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import type { FormFieldType } from "@/types";
+import { format } from "date-fns";
 
-const languages = [
-  { label: 'English', value: 'en' },
-  { label: 'French', value: 'fr' },
-  { label: 'German', value: 'de' },
-  { label: 'Spanish', value: 'es' },
-  { label: 'Portuguese', value: 'pt' },
-  { label: 'Russian', value: 'ru' },
-  { label: 'Japanese', value: 'ja' },
-  { label: 'Korean', value: 'ko' },
-  { label: 'Chinese', value: 'zh' },
-] as const
+const countries = [
+  { label: "United States", value: "US" },
+  { label: "Canada", value: "CA" },
+  { label: "Mexico", value: "MX" },
+  { label: "Spain", value: "ES" },
+  { label: "United Kingdom", value: "GB" },
+];
 
-const FileSvgDraw = () => {
-  return (
-    <>
-      <svg
-        className="w-8 h-8 mb-3 text-gray-500 dark:text-gray-400"
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 20 16"
-      >
-        <path
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"
-        />
-      </svg>
-      <p className="mb-1 text-sm text-gray-500 dark:text-gray-400">
-        <span className="font-semibold">Click to upload</span>
-        &nbsp; or drag and drop
-      </p>
-      <p className="text-xs text-gray-500 dark:text-gray-400">
-        SVG, PNG, JPG or GIF
-      </p>
-    </>
-  )
-}
+const paymentMethods = [
+  { label: "Credit Card", value: "credit_card" },
+  { label: "PayPal", value: "paypal" },
+  { label: "Apple Pay", value: "apple_pay" },
+  { label: "Google Pay", value: "google_pay" },
+];
 
-export const renderFormField = (field: FormFieldType, form: any) => {
-  const [checked, setChecked] = useState<boolean>(field.checked)
-  const [value, setValue] = useState<any>(field.value)
-  const [selectedValues, setSelectedValues] = useState<string[]>(['React'])
-  const [tagsValue, setTagsValue] = useState<string[]>([])
-  const [files, setFiles] = useState<File[] | null>(null) // Initialize to null or use [] for an empty array
-  const [sliderValue, setSliderValue] = useState<number[]>([5])
-  const [date, setDate] = useState<Date | undefined>(new Date())
-  const [datetime, setDatetime] = useState<Date | undefined>(new Date())
-  const [smartDatetime, setSmartDatetime] = useState<Date | null>()
-  const [countryName, setCountryName] = useState<string>('')
-  const [stateName, setStateName] = useState<string>('')
-  const [password, setPassword] = useState<string>('')
-  const [rating, setRating] = useState<number>(0)
-  const [creditCard, setCreditCard] = useState<CreditCardValue>({
-    cardholderName: '',
-    cardNumber: '',
-    expiryMonth: '',
-    expiryYear: '',
-    cvv: '',
-  })
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+const currencies = [
+  { label: "USD - US Dollar", value: "USD" },
+  { label: "EUR - Euro", value: "EUR" },
+  { label: "GBP - British Pound", value: "GBP" },
+  { label: "MXN - Mexican Peso", value: "MXN" },
+  { label: "CAD - Canadian Dollar", value: "CAD" },
+];
 
-  const dropZoneConfig = {
-    maxFiles: 5,
-    maxSize: 1024 * 1024 * 4,
-    multiple: true,
-  }
+const paymentOptions = [
+  { label: "Split Payment", value: "split_payment" },
+  { label: "Installments", value: "installments" },
+  { label: "Save Card for Future", value: "save_card" },
+];
+
+const states = [
+  { label: "California", value: "CA" },
+  { label: "Texas", value: "TX" },
+  { label: "Florida", value: "FL" },
+  { label: "New York", value: "NY" },
+];
+
+export const renderFormField = (field: FormFieldType) => {
+  const [value, setValue] = useState(field.value || "");
+  const [checked, setChecked] = useState(field.checked || false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] =
+    useState<string>("");
+  const [selectedValues, setSelectedValues] = useState<string[]>(
+    Array.isArray(field.value) ? field.value : [],
+  );
+  const [date, setDate] = useState<Date | undefined>(
+    field.value instanceof Date ? field.value : undefined,
+  );
+  const [otp, setOtp] = useState("");
+  const [creditCard, setCreditCard] = useState({
+    cardholderName: "",
+    cardNumber: "",
+    expiryMonth: "",
+    expiryYear: "",
+    cvv: "",
+  });
+  const [paypalEmail, setPaypalEmail] = useState("");
+  const [applePayData, setApplePayData] = useState({
+    token: "",
+    deviceId: "",
+  });
+  const [googlePayData, setGooglePayData] = useState({
+    token: "",
+    accountId: "",
+  });
+  const [openCombobox, setOpenCombobox] = useState(false);
+
+  const handleChange = (newValue: string | boolean | Date | string[]) => {
+    setValue(newValue);
+    field.onChange(newValue);
+  };
+
+  const handleMultiSelect = (selectedValue: string) => {
+    const updated = selectedValues.includes(selectedValue)
+      ? selectedValues.filter((v) => v !== selectedValue)
+      : [...selectedValues, selectedValue];
+    setSelectedValues(updated);
+    field.onChange(updated);
+  };
+
+  const handleCardChange = (fieldName: string, fieldValue: string) => {
+    const updated = { ...creditCard, [fieldName]: fieldValue };
+    setCreditCard(updated);
+    field.onChange(updated);
+  };
+
+  const handleApplePayChange = (fieldName: string, fieldValue: string) => {
+    const updated = { ...applePayData, [fieldName]: fieldValue };
+    setApplePayData(updated);
+    field.onChange(updated);
+  };
+
+  const handleGooglePayChange = (fieldName: string, fieldValue: string) => {
+    const updated = { ...googlePayData, [fieldName]: fieldValue };
+    setGooglePayData(updated);
+    field.onChange(updated);
+  };
+
+  const formatCardNumber = (num: string) => {
+    return num
+      .replace(/\s/g, "")
+      .replace(/(\d{4})/g, "$1 ")
+      .trim();
+  };
 
   switch (field.variant) {
-    case 'Checkbox':
+    case "Input":
       return (
-        <FormItem className="flex flex-col">
-          <div
-            className={cn(
-              'flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4',
-              field.className,
+        <div className="space-y-2">
+          <Label htmlFor={field.name}>{field.label}</Label>
+          <Input
+            id={field.name}
+            placeholder={field.placeholder}
+            value={value}
+            onChange={(e) => handleChange(e.target.value)}
+            disabled={field.disabled}
+            required={field.required}
+          />
+          {field.description && (
+            <p className="text-xs text-gray-500">{field.description}</p>
+          )}
+        </div>
+      );
+
+    case "Email":
+      return (
+        <div className="space-y-2">
+          <Label htmlFor={field.name}>{field.label}</Label>
+          <Input
+            id={field.name}
+            placeholder={field.placeholder || "email@example.com"}
+            value={value}
+            onChange={(e) => handleChange(e.target.value)}
+            disabled={field.disabled}
+            required={field.required}
+            type="email"
+          />
+          {field.description && (
+            <p className="text-xs text-gray-500">{field.description}</p>
+          )}
+        </div>
+      );
+
+    case "Phone":
+      return (
+        <div className="space-y-2">
+          <Label htmlFor={field.name}>{field.label}</Label>
+          <Input
+            id={field.name}
+            placeholder={field.placeholder || "+1 (555) 000-0000"}
+            value={value}
+            onChange={(e) => handleChange(e.target.value)}
+            disabled={field.disabled}
+            required={field.required}
+            type="tel"
+          />
+          {field.description && (
+            <p className="text-xs text-gray-500">{field.description}</p>
+          )}
+        </div>
+      );
+
+    case "Select":
+      return (
+        <div className="space-y-2">
+          <Label htmlFor={field.name}>{field.label}</Label>
+          <Select value={value as string} onValueChange={handleChange}>
+            <SelectTrigger id={field.name} disabled={field.disabled}>
+              <SelectValue placeholder={field.placeholder} />
+            </SelectTrigger>
+            <SelectContent>
+              {countries.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {field.description && (
+            <p className="text-xs text-gray-500">{field.description}</p>
+          )}
+        </div>
+      );
+
+    case "Multi Select":
+      return (
+        <div className="space-y-3">
+          <Label>{field.label}</Label>
+          <div className="space-y-2">
+            {paymentOptions.map((option) => (
+              <div key={option.value} className="flex items-center space-x-2">
+                <Checkbox
+                  id={option.value}
+                  checked={selectedValues.includes(option.value)}
+                  onCheckedChange={() => handleMultiSelect(option.value)}
+                  disabled={field.disabled}
+                />
+                <Label htmlFor={option.value} className="cursor-pointer">
+                  {option.label}
+                </Label>
+              </div>
+            ))}
+          </div>
+          {field.description && (
+            <p className="text-xs text-gray-500">{field.description}</p>
+          )}
+        </div>
+      );
+
+    case "Payment Method Selector":
+      return (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor={field.name}>{field.label}</Label>
+            <Select
+              value={selectedPaymentMethod}
+              onValueChange={(method) => {
+                setSelectedPaymentMethod(method);
+                handleChange(method);
+              }}
+            >
+              <SelectTrigger id={field.name} disabled={field.disabled}>
+                <SelectValue placeholder="Select payment method" />
+              </SelectTrigger>
+              <SelectContent>
+                {paymentMethods.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {field.description && (
+              <p className="text-xs text-gray-500">{field.description}</p>
             )}
-          >
-            <FormControl>
-              <Checkbox
-                checked={checked} // Ensure this is handled as boolean
-                onCheckedChange={() => {
-                  setChecked(!checked)
-                }}
+          </div>
+
+          {selectedPaymentMethod === "credit_card" && (
+            <div className="space-y-4 pt-4 border-t">
+              <Label>Credit Card Details</Label>
+
+              <div className="space-y-2">
+                <Label htmlFor="cardholder" className="text-xs">
+                  Cardholder Name
+                </Label>
+                <Input
+                  id="cardholder"
+                  placeholder="John Doe"
+                  value={creditCard.cardholderName}
+                  onChange={(e) =>
+                    handleCardChange("cardholderName", e.target.value)
+                  }
+                  disabled={field.disabled}
+                  required={field.required}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="cardnumber" className="text-xs">
+                  Card Number
+                </Label>
+                <Input
+                  id="cardnumber"
+                  placeholder="1234 5678 9012 3456"
+                  value={formatCardNumber(creditCard.cardNumber)}
+                  onChange={(e) =>
+                    handleCardChange(
+                      "cardNumber",
+                      e.target.value.replace(/\s/g, ""),
+                    )
+                  }
+                  disabled={field.disabled}
+                  required={field.required}
+                  maxLength={19}
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                <div className="space-y-2">
+                  <Label htmlFor="month" className="text-xs">
+                    Month
+                  </Label>
+                  <Input
+                    id="month"
+                    placeholder="MM"
+                    value={creditCard.expiryMonth}
+                    onChange={(e) =>
+                      handleCardChange("expiryMonth", e.target.value)
+                    }
+                    disabled={field.disabled}
+                    maxLength={2}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="year" className="text-xs">
+                    Year
+                  </Label>
+                  <Input
+                    id="year"
+                    placeholder="YY"
+                    value={creditCard.expiryYear}
+                    onChange={(e) =>
+                      handleCardChange("expiryYear", e.target.value)
+                    }
+                    disabled={field.disabled}
+                    maxLength={2}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cvv" className="text-xs">
+                    CVV
+                  </Label>
+                  <Input
+                    id="cvv"
+                    placeholder="123"
+                    value={creditCard.cvv}
+                    onChange={(e) => handleCardChange("cvv", e.target.value)}
+                    disabled={field.disabled}
+                    required={field.required}
+                    maxLength={4}
+                    type="password"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {selectedPaymentMethod === "paypal" && (
+            <div className="space-y-4 pt-4 border-t">
+              <Label>PayPal Account</Label>
+
+              <div className="space-y-2">
+                <Label htmlFor="paypal-email" className="text-xs">
+                  PayPal Email
+                </Label>
+                <Input
+                  id="paypal-email"
+                  placeholder="your-email@paypal.com"
+                  value={paypalEmail}
+                  onChange={(e) => {
+                    setPaypalEmail(e.target.value);
+                    field.onChange(e.target.value);
+                  }}
+                  disabled={field.disabled}
+                  required={field.required}
+                  type="email"
+                />
+              </div>
+
+              <Button
+                variant="outline"
+                className="w-full"
+                disabled={field.disabled || !paypalEmail}
+              >
+                Connect PayPal Account
+              </Button>
+            </div>
+          )}
+
+          {selectedPaymentMethod === "apple_pay" && (
+            <div className="space-y-4 pt-4 border-t">
+              <Label>Apple Pay</Label>
+
+              <div className="space-y-2">
+                <Label htmlFor="apple-token" className="text-xs">
+                  Payment Token
+                </Label>
+                <Input
+                  id="apple-token"
+                  placeholder="Apple Pay token"
+                  value={applePayData.token}
+                  onChange={(e) =>
+                    handleApplePayChange("token", e.target.value)
+                  }
+                  disabled={field.disabled}
+                  required={field.required}
+                  type="password"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="apple-device" className="text-xs">
+                  Device ID
+                </Label>
+                <Input
+                  id="apple-device"
+                  placeholder="Your device identifier"
+                  value={applePayData.deviceId}
+                  onChange={(e) =>
+                    handleApplePayChange("deviceId", e.target.value)
+                  }
+                  disabled={field.disabled}
+                  required={field.required}
+                />
+              </div>
+
+              <Button
+                variant="outline"
+                className="w-full bg-black text-white hover:bg-gray-800"
+                disabled={field.disabled || !applePayData.token}
+              >
+                Pay with Apple Pay
+              </Button>
+            </div>
+          )}
+
+          {selectedPaymentMethod === "google_pay" && (
+            <div className="space-y-4 pt-4 border-t">
+              <Label>Google Pay</Label>
+
+              <div className="space-y-2">
+                <Label htmlFor="google-token" className="text-xs">
+                  Payment Token
+                </Label>
+                <Input
+                  id="google-token"
+                  placeholder="Google Pay token"
+                  value={googlePayData.token}
+                  onChange={(e) =>
+                    handleGooglePayChange("token", e.target.value)
+                  }
+                  disabled={field.disabled}
+                  required={field.required}
+                  type="password"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="google-account" className="text-xs">
+                  Google Account ID
+                </Label>
+                <Input
+                  id="google-account"
+                  placeholder="Your Google account identifier"
+                  value={googlePayData.accountId}
+                  onChange={(e) =>
+                    handleGooglePayChange("accountId", e.target.value)
+                  }
+                  disabled={field.disabled}
+                  required={field.required}
+                />
+              </div>
+
+              <Button
+                variant="outline"
+                className="w-full border-blue-500 text-blue-600 hover:bg-blue-50"
+                disabled={field.disabled || !googlePayData.token}
+              >
+                Pay with Google Pay
+              </Button>
+            </div>
+          )}
+        </div>
+      );
+
+    case "Credit Card":
+      return (
+        <div className="space-y-4">
+          <Label>{field.label}</Label>
+
+          <div className="space-y-2">
+            <Label htmlFor="cardholder" className="text-xs">
+              Cardholder Name
+            </Label>
+            <Input
+              id="cardholder"
+              placeholder="John Doe"
+              value={creditCard.cardholderName}
+              onChange={(e) =>
+                handleCardChange("cardholderName", e.target.value)
+              }
+              disabled={field.disabled}
+              required={field.required}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="cardnumber" className="text-xs">
+              Card Number
+            </Label>
+            <Input
+              id="cardnumber"
+              placeholder="1234 5678 9012 3456"
+              value={formatCardNumber(creditCard.cardNumber)}
+              onChange={(e) =>
+                handleCardChange(
+                  "cardNumber",
+                  e.target.value.replace(/\s/g, ""),
+                )
+              }
+              disabled={field.disabled}
+              required={field.required}
+              maxLength={19}
+            />
+          </div>
+
+          <div className="grid grid-cols-3 gap-2">
+            <div className="space-y-2">
+              <Label htmlFor="month" className="text-xs">
+                Month
+              </Label>
+              <Input
+                id="month"
+                placeholder="MM"
+                value={creditCard.expiryMonth}
+                onChange={(e) =>
+                  handleCardChange("expiryMonth", e.target.value)
+                }
                 disabled={field.disabled}
+                maxLength={2}
               />
-            </FormControl>
-            <div className="space-y-1 leading-none">
-              <FormLabel className="flex items-center gap-1 flex-nowrap">{field.label} {field.required && '*'}</FormLabel>
-              <FormDescription>{field.description}</FormDescription>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="year" className="text-xs">
+                Year
+              </Label>
+              <Input
+                id="year"
+                placeholder="YY"
+                value={creditCard.expiryYear}
+                onChange={(e) => handleCardChange("expiryYear", e.target.value)}
+                disabled={field.disabled}
+                maxLength={2}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cvv" className="text-xs">
+                CVV
+              </Label>
+              <Input
+                id="cvv"
+                placeholder="123"
+                value={creditCard.cvv}
+                onChange={(e) => handleCardChange("cvv", e.target.value)}
+                disabled={field.disabled}
+                required={field.required}
+                maxLength={4}
+                type="password"
+              />
             </div>
           </div>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'Combobox':
+
+          {field.description && (
+            <p className="text-xs text-gray-500">{field.description}</p>
+          )}
+        </div>
+      );
+
+    case "PayPal":
       return (
-        <FormItem className="flex flex-col">
-          <div>
-            <FormLabel className="flex items-center gap-1 flex-nowrap">{field.label} {field.required && '*'}</FormLabel>
-          </div>{' '}
-          <Popover>
-            <PopoverTrigger asChild>
-              <FormControl>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  className={cn(
-                    'w-full justify-between',
-                    !value && 'text-muted-foreground',
-                  )}
-                >
-                  {value
-                    ? languages.find((language) => language.value === value)
-                      ?.label
-                    : 'Select language'}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </FormControl>
-            </PopoverTrigger>
-            <PopoverContent className="p-0">
-              <Command>
-                <CommandInput placeholder="Search language..." />
-                <CommandList>
-                  <CommandEmpty>No language found.</CommandEmpty>
-                  <CommandGroup>
-                    {languages.map((language) => (
-                      <CommandItem
-                        value={language.label}
-                        key={language.value}
-                        onSelect={() => {
-                          setValue(language.value)
-                          form.setValue(field.name, language.value)
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            'mr-2 h-4 w-4',
-                            language.value === value
-                              ? 'opacity-100'
-                              : 'opacity-0',
-                          )}
-                        />
-                        {language.label}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-          <FormDescription>{field.description}</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'Date Picker':
-      return (
-        <FormItem className="flex flex-col">
-          <div>
-            <FormLabel className="flex items-center gap-1 flex-nowrap">{field.label} {field.required && '*'}</FormLabel>
+        <div className="space-y-4">
+          <Label>{field.label}</Label>
+
+          <div className="space-y-2">
+            <Label htmlFor="paypal-email" className="text-xs">
+              PayPal Email
+            </Label>
+            <Input
+              id="paypal-email"
+              placeholder="your-email@paypal.com"
+              value={paypalEmail}
+              onChange={(e) => {
+                setPaypalEmail(e.target.value);
+                field.onChange(e.target.value);
+              }}
+              disabled={field.disabled}
+              required={field.required}
+              type="email"
+            />
           </div>
+
+          <Button
+            variant="outline"
+            className="w-full"
+            disabled={field.disabled || !paypalEmail}
+          >
+            Connect PayPal Account
+          </Button>
+
+          {field.description && (
+            <p className="text-xs text-gray-500">{field.description}</p>
+          )}
+        </div>
+      );
+
+    case "Apple Pay":
+      return (
+        <div className="space-y-4">
+          <Label>{field.label}</Label>
+
+          <div className="space-y-2">
+            <Label htmlFor="apple-token" className="text-xs">
+              Payment Token
+            </Label>
+            <Input
+              id="apple-token"
+              placeholder="Apple Pay token"
+              value={applePayData.token}
+              onChange={(e) => handleApplePayChange("token", e.target.value)}
+              disabled={field.disabled}
+              required={field.required}
+              type="password"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="apple-device" className="text-xs">
+              Device ID
+            </Label>
+            <Input
+              id="apple-device"
+              placeholder="Your device identifier"
+              value={applePayData.deviceId}
+              onChange={(e) => handleApplePayChange("deviceId", e.target.value)}
+              disabled={field.disabled}
+              required={field.required}
+            />
+          </div>
+
+          <Button
+            className="w-full bg-black text-white hover:bg-gray-800"
+            disabled={field.disabled || !applePayData.token}
+          >
+            Pay with Apple Pay
+          </Button>
+
+          {field.description && (
+            <p className="text-xs text-gray-500">{field.description}</p>
+          )}
+        </div>
+      );
+
+    case "Google Pay":
+      return (
+        <div className="space-y-4">
+          <Label>{field.label}</Label>
+
+          <div className="space-y-2">
+            <Label htmlFor="google-token" className="text-xs">
+              Payment Token
+            </Label>
+            <Input
+              id="google-token"
+              placeholder="Google Pay token"
+              value={googlePayData.token}
+              onChange={(e) => handleGooglePayChange("token", e.target.value)}
+              disabled={field.disabled}
+              required={field.required}
+              type="password"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="google-account" className="text-xs">
+              Google Account ID
+            </Label>
+            <Input
+              id="google-account"
+              placeholder="Your Google account identifier"
+              value={googlePayData.accountId}
+              onChange={(e) =>
+                handleGooglePayChange("accountId", e.target.value)
+              }
+              disabled={field.disabled}
+              required={field.required}
+            />
+          </div>
+
+          <Button
+            variant="outline"
+            className="w-full border-blue-500 text-blue-600 hover:bg-blue-50"
+            disabled={field.disabled || !googlePayData.token}
+          >
+            Pay with Google Pay
+          </Button>
+
+          {field.description && (
+            <p className="text-xs text-gray-500">{field.description}</p>
+          )}
+        </div>
+      );
+
+    case "Date Picker":
+      return (
+        <div className="space-y-2">
+          <Label htmlFor={field.name}>{field.label}</Label>
           <Popover>
             <PopoverTrigger asChild>
-              <FormControl>
-                <Button
-                  variant={'outline'}
-                  className={cn(
-                    'w-full justify-start text-left font-normal',
-                    !date && 'text-muted-foreground',
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, 'PPP') : <span>Pick a date</span>}
-                </Button>
-              </FormControl>
+              <Button
+                id={field.name}
+                variant="outline"
+                className="w-full justify-start"
+                disabled={field.disabled}
+              >
+                {date ? format(date, "PPP") : "Select a date"}
+              </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
                 selected={date}
-                onSelect={(newDate) => {
-                  setDate(newDate)
-                  form.setValue(field.name, newDate, {
-                    shouldValidate: true,
-                    shouldDirty: true,
-                  })
+                onSelect={(selectedDate) => {
+                  setDate(selectedDate);
+                  handleChange(selectedDate || new Date());
                 }}
-                initialFocus
+                disabled={field.disabled}
               />
             </PopoverContent>
           </Popover>
-          <FormDescription>{field.description}</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'Datetime Picker':
+          {field.description && (
+            <p className="text-xs text-gray-500">{field.description}</p>
+          )}
+        </div>
+      );
+
+    case "Textarea":
       return (
-        <FormItem className="flex flex-col">
-          <div>
-            <FormLabel className="flex items-center gap-1 flex-nowrap">{field.label} {field.required && '*'}</FormLabel>
-          </div>
-          <DatetimePicker
-            {...field}
-            value={datetime}
-            // onChange={setDatetime}
-            onChange={(newDate) => {
-              setDatetime(newDate)
-              form.setValue(field.name, newDate, {
-                shouldValidate: true,
-                shouldDirty: true,
-              })
-            }}
-            format={[
-              ['months', 'days', 'years'],
-              ['hours', 'minutes', 'am/pm'],
-            ]}
+        <div className="space-y-2">
+          <Label htmlFor={field.name}>{field.label}</Label>
+          <Textarea
+            id={field.name}
+            placeholder={field.placeholder}
+            value={value}
+            onChange={(e) => handleChange(e.target.value)}
+            disabled={field.disabled}
+            required={field.required}
+            rows={4}
           />
-          <FormDescription>{field.description}</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'File Input':
+          {field.description && (
+            <p className="text-xs text-gray-500">{field.description}</p>
+          )}
+        </div>
+      );
+
+    case "Checkbox":
       return (
-        <FormItem>
-          <FormLabel className="flex items-center gap-1 flex-nowrap">{field.label} {field.required && '*'}</FormLabel>
-          <FormControl>
-            <FileUploader
-              value={files}
-              onValueChange={setFiles}
-              dropzoneOptions={dropZoneConfig}
-              className="relative bg-background rounded-lg p-2"
-            >
-              <FileInput
-                id="fileInput"
-                className="outline-dashed outline-1 outline-slate-500"
+        <div className="flex items-start space-x-2">
+          <Checkbox
+            id={field.name}
+            checked={checked}
+            onCheckedChange={(isChecked) => {
+              setChecked(isChecked as boolean);
+              handleChange(isChecked as boolean);
+            }}
+            disabled={field.disabled}
+            required={field.required}
+          />
+          <div>
+            <Label htmlFor={field.name} className="cursor-pointer">
+              {field.label}
+            </Label>
+            {field.description && (
+              <p className="text-xs text-gray-500">{field.description}</p>
+            )}
+          </div>
+        </div>
+      );
+
+    case "Switch":
+      return (
+        <div className="flex items-center justify-between">
+          <div>
+            <Label>{field.label}</Label>
+            {field.description && (
+              <p className="text-xs text-gray-500">{field.description}</p>
+            )}
+          </div>
+          <Switch
+            checked={checked}
+            onCheckedChange={(isChecked) => {
+              setChecked(isChecked);
+              handleChange(isChecked);
+            }}
+            disabled={field.disabled}
+          />
+        </div>
+      );
+
+    case "Input OTP":
+      return (
+        <div className="space-y-2">
+          <Label htmlFor={field.name}>{field.label}</Label>
+          <InputOTP
+            maxLength={6}
+            value={otp}
+            onChange={(value) => {
+              setOtp(value);
+              handleChange(value);
+            }}
+            disabled={field.disabled}
+          >
+            <InputOTPGroup>
+              <InputOTPSlot index={0} />
+              <InputOTPSlot index={1} />
+              <InputOTPSlot index={2} />
+              <InputOTPSlot index={3} />
+              <InputOTPSlot index={4} />
+              <InputOTPSlot index={5} />
+            </InputOTPGroup>
+          </InputOTP>
+          {field.description && (
+            <p className="text-xs text-gray-500">{field.description}</p>
+          )}
+        </div>
+      );
+
+    case "Combobox":
+      return (
+        <div className="space-y-2">
+          <Label htmlFor={field.name}>{field.label}</Label>
+          <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
+            <PopoverTrigger asChild>
+              <Button
+                id={field.name}
+                variant="outline"
+                className="w-full justify-between"
+                disabled={field.disabled}
               >
-                <div className="flex items-center justify-center flex-col pt-3 pb-4 w-full ">
-                  <FileSvgDraw />
-                </div>
-              </FileInput>
-              <FileUploaderContent>
-                {files &&
-                  files.length > 0 &&
-                  files.map((file, i) => (
-                    <FileUploaderItem key={i} index={i}>
-                      <Paperclip className="h-4 w-4 stroke-current" />
-                      <span>{file.name}</span>
-                    </FileUploaderItem>
+                {value || field.placeholder}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-0">
+              <Command>
+                <CommandInput placeholder="Search..." />
+                <CommandEmpty>No results found.</CommandEmpty>
+                <CommandGroup>
+                  {states.map((option) => (
+                    <CommandItem
+                      key={option.value}
+                      value={option.value}
+                      onSelect={(currentValue) => {
+                        handleChange(currentValue);
+                        setOpenCombobox(false);
+                      }}
+                    >
+                      {option.label}
+                    </CommandItem>
                   ))}
-              </FileUploaderContent>
-            </FileUploader>
-          </FormControl>
-          <FormDescription>{field.description}</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'Input':
+                </CommandGroup>
+              </Command>
+            </PopoverContent>
+          </Popover>
+          {field.description && (
+            <p className="text-xs text-gray-500">{field.description}</p>
+          )}
+        </div>
+      );
+
+    case "Coupon Code":
       return (
-        <FormItem>
-          <FormLabel className="flex items-center gap-1 flex-nowrap">{field.label} {field.required && '*'}</FormLabel>
-          <FormControl>
+        <div className="space-y-2">
+          <Label htmlFor={field.name}>{field.label}</Label>
+          <div className="flex gap-2">
             <Input
-              placeholder={field.placeholder}
+              id={field.name}
+              placeholder={field.placeholder || "Enter code"}
+              value={value}
+              onChange={(e) => handleChange(e.target.value)}
               disabled={field.disabled}
-              type={field?.type}
+              className="flex-1"
             />
-          </FormControl>
-          <FormDescription>{field.description}</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'Input OTP':
-      return (
-        <FormItem>
-          <FormLabel className="flex items-center gap-1 flex-nowrap">{field.label} {field.required && '*'}</FormLabel>
-          <FormControl>
-            <InputOTP maxLength={6}>
-              <InputOTPGroup>
-                <InputOTPSlot index={0} />
-                <InputOTPSlot index={1} />
-                <InputOTPSlot index={2} />
-              </InputOTPGroup>
-              <InputOTPSeparator />
-              <InputOTPGroup>
-                <InputOTPSlot index={3} />
-                <InputOTPSlot index={4} />
-                <InputOTPSlot index={5} />
-              </InputOTPGroup>
-            </InputOTP>
-          </FormControl>
-          <FormDescription>{field.description}</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'Location Input':
-      return (
-        <FormItem className="flex flex-col">
-          <div>
-            <FormLabel className="flex items-center gap-1 flex-nowrap">{field.label} {field.required && '*'}</FormLabel>
+            <Button variant="secondary" disabled={field.disabled || !value}>
+              Apply
+            </Button>
           </div>
-          <LocationSelector
-            onCountryChange={(country) => {
-              setCountryName(country?.name || '')
-              form.setValue(field.name, [country?.name || '', stateName || ''])
-            }}
-            onStateChange={(state) => {
-              setStateName(state?.name || '')
-              form.setValue(field.name, [
-                form.getValues(field.name)[0] || '',
-                state?.name || '',
-              ])
-            }}
-          />
-          <FormDescription>{field.description}</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'Multi Select':
+          {field.description && (
+            <p className="text-xs text-gray-500">{field.description}</p>
+          )}
+        </div>
+      );
+
+    case "Amount Input":
       return (
-        <FormItem>
-          <FormLabel className="flex items-center gap-1 flex-nowrap">{field.label} {field.required && '*'}</FormLabel>
-          <FormControl>
-            <MultiSelector
-              values={selectedValues}
-              onValuesChange={(newValues) => {
-                setSelectedValues(newValues)
-                form.setValue(field.name, newValues, {
-                  shouldValidate: true,
-                  shouldDirty: true,
-                })
-              }}
-              className="max-w-xs"
-            >
-              <MultiSelectorTrigger>
-                <MultiSelectorInput placeholder="Select languages" />
-              </MultiSelectorTrigger>
-              <MultiSelectorContent>
-                <MultiSelectorList>
-                  <MultiSelectorItem value={'React'}>React</MultiSelectorItem>
-                  <MultiSelectorItem value={'Vue'}>Vue</MultiSelectorItem>
-                  <MultiSelectorItem value={'Svelte'}>Svelte</MultiSelectorItem>
-                </MultiSelectorList>
-              </MultiSelectorContent>
-            </MultiSelector>
-          </FormControl>
-          <FormDescription>{field.description}</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'Select':
+        <div className="space-y-2">
+          <Label htmlFor={field.name}>{field.label}</Label>
+          <div className="relative">
+            <span className="absolute left-3 top-2.5 text-gray-500">$</span>
+            <Input
+              id={field.name}
+              placeholder={field.placeholder || "0.00"}
+              value={value}
+              onChange={(e) => handleChange(e.target.value)}
+              disabled={field.disabled}
+              required={field.required}
+              type="number"
+              step="0.01"
+              className="pl-8"
+            />
+          </div>
+          {field.description && (
+            <p className="text-xs text-gray-500">{field.description}</p>
+          )}
+        </div>
+      );
+
+    case "Currency Select":
       return (
-        <FormItem>
-          <FormLabel className="flex items-center gap-1 flex-nowrap">{field.label} {field.required && '*'}</FormLabel>
-          <Select onValueChange={field.onChange}>
-            <FormControl>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a verified email to display" />
-              </SelectTrigger>
-            </FormControl>
+        <div className="space-y-2">
+          <Label htmlFor={field.name}>{field.label}</Label>
+          <Select value={value as string} onValueChange={handleChange}>
+            <SelectTrigger id={field.name} disabled={field.disabled}>
+              <SelectValue placeholder="Select currency" />
+            </SelectTrigger>
             <SelectContent>
-              <SelectItem value="m@example.com">m@example.com</SelectItem>
-              <SelectItem value="m@google.com">m@google.com</SelectItem>
-              <SelectItem value="m@support.com">m@support.com</SelectItem>
+              {currencies.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
-          <FormDescription>{field.description}</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'Slider':
-      const min = field.min || 0
-      const max = field.max || 100
-      const step = field.step || 1
-      const defaultValue = 5
-
-      return (
-        <FormItem>
-          <FormLabel className="flex items-center gap-1 flex-nowrap">{field.label} {field.required && '*'}</FormLabel>
-          <FormControl>
-            <Slider
-              min={min}
-              max={max}
-              step={step}
-              value={sliderValue}
-              onValueChange={(value) => {
-                setSliderValue(value)
-              }} // Update to set the first value as a number
-            />
-          </FormControl>
-          <FormDescription className="py-3">
-            {field.description} Selected value is {value || defaultValue},
-            minimun valus is {min}, maximim values is {max}, step size is {step}
-          </FormDescription>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'Signature Input':
-      return (
-        <FormItem>
-          <FormLabel className="flex items-center gap-1 flex-nowrap">{field.label} {field.required && '*'}</FormLabel>
-          <FormControl>
-            <SignatureInput
-              canvasRef={canvasRef}
-              onSignatureChange={(signature) => {
-                form.setValue(field.name, signature || undefined)
-              }}
-            />
-          </FormControl>
-          <FormDescription className="py-3">
-            {field.description}
-          </FormDescription>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'Signature Pad':
-      return (
-        <FormItem>
-          <FormLabel className="flex items-center gap-1 flex-nowrap">{field.label} {field.required && '*'}</FormLabel>
-          <FormControl>
-            <SignaturePad
-              value={value as string | null}
-              onChange={(signature) => {
-                setValue(signature)
-                form.setValue(field.name, signature || undefined)
-              }}
-            />
-          </FormControl>
-          <FormDescription className="py-3">
-            {field.description}
-          </FormDescription>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'Smart Datetime Input':
-      return (
-        <FormItem>
-          <FormLabel className="flex items-center gap-1 flex-nowrap">{field.label} {field.required && '*'}</FormLabel>
-          <FormControl>
-            <SmartDatetimeInput
-              locale={field.locale as any}
-              hour12={field.hour12}
-              value={smartDatetime}
-              onValueChange={(newDate) => {
-                setSmartDatetime(newDate)
-                form.setValue(field.name, newDate, {
-                  shouldValidate: true,
-                  shouldDirty: true,
-                })
-              }}
-              placeholder="e.g. tomorrow at 3pm"
-            />
-          </FormControl>
-          <FormDescription className="py-3">
-            {field.description}
-          </FormDescription>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'Switch':
-      return (
-        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-          <div className="space-y-0.5">
-            <FormLabel className="flex items-center gap-1 flex-nowrap">{field.label} {field.required && '*'}</FormLabel>
-            <FormDescription>{field.description}</FormDescription>
-          </div>
-          <FormControl>
-            <Switch
-              checked={checked}
-              onCheckedChange={() => {
-                setChecked(!checked)
-              }}
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'Tags Input':
-      return (
-        <FormItem>
-          <FormLabel className="flex items-center gap-1 flex-nowrap">{field.label} {field.required && '*'}</FormLabel>
-          <FormControl>
-            <TagsInput
-              value={tagsValue}
-              onValueChange={(newTags) => {
-                setTagsValue(newTags)
-                form.setValue(field.name, newTags, {
-                  shouldValidate: true,
-                  shouldDirty: true,
-                })
-              }}
-              placeholder="Enter your tags"
-            />
-          </FormControl>
-          <FormDescription>{field.description}</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'Textarea':
-      return (
-        <FormItem>
-          <FormLabel className="flex items-center gap-1 flex-nowrap">{field.label} {field.required && '*'}</FormLabel>
-          <FormControl>
-            <Textarea
-              placeholder={field.placeholder}
-              className="resize-none"
-            // {...field}
-            />
-          </FormControl>
-          <FormDescription>{field.description}</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'Password':
-      return (
-        <FormItem>
-          <FormLabel className="flex items-center gap-1 flex-nowrap">{field.label} {field.required && '*'}</FormLabel>
-          <FormControl>
-            <PasswordInput
-              value={password}
-              placeholder={field.placeholder}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setPassword(e.target.value)
-                form.setValue(field.name, e.target.value, {
-                  shouldValidate: true,
-                  shouldDirty: true,
-                })
-              }}
-            />
-          </FormControl>
-          <FormDescription>{field.description}</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'Phone':
-      return (
-        <FormItem>
-          <FormLabel className="flex items-center gap-1 flex-nowrap">{field.label} {field.required && '*'}</FormLabel>
-          <FormControl>
-            <PhoneInput
-              defaultCountry="TR"
-              onChange={(phoneNumber) => {
-                form.setValue(field.name, phoneNumber, {
-                  shouldValidate: true,
-                  shouldDirty: true,
-                })
-              }}
-            />
-          </FormControl>
-          <FormDescription>{field.description}</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'Rating':
-      return (
-        <FormItem>
-          <FormLabel className="flex items-center gap-1 flex-nowrap">{field.label} {field.required && '*'}</FormLabel>
-          <FormControl>
-            <Rating
-              value={rating}
-              onChange={(value) => {
-                setRating(value)
-                form.setValue(field.name, value.toString(), {
-                  shouldValidate: true,
-                  shouldDirty: true,
-                })
-              }}
-            />
-          </FormControl>
-          <FormDescription>{field.description}</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'RadioGroup':
-      return (
-        <FormItem className="space-y-3">
-          <FormLabel>{field.label}</FormLabel>
-          <FormControl>
-            <RadioGroup
-              onValueChange={field.onChange}
-              className="flex flex-col space-y-1"
-            >
-              {[
-                ['Male', 'male'],
-                ['Female', 'female'],
-                ['Other', 'other'],
-              ].map((option, index) => {
-                return (
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value={option[1]} />
-                    </FormControl>
-                    <FormLabel className="font-normal">{option[0]}</FormLabel>
-                  </FormItem>
-                )
-              })}
-            </RadioGroup>
-          </FormControl>
-          <FormDescription>{field.description}</FormDescription>
-          <FormMessage />
-        </FormItem>
-      )
-    case 'Credit Card':
-      return (
-        <FormField
-          control={form.control}
-          name={field.name}
-          render={({ field: formField }) => (
-            <FormItem>
-              <FormLabel>{field.label}</FormLabel>
-              <FormControl>
-                <CreditCard
-                  value={creditCard}
-                  onChange={(value) => {
-                    setCreditCard(value)
-                    // Update form with the credit card object directly
-                    formField.onChange(value)
-                    form.setValue(field.name, value, {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                    })
-                  }}
-                />
-              </FormControl>
-              <FormDescription>{field.description}</FormDescription>
-              <FormMessage />
-            </FormItem>
+          {field.description && (
+            <p className="text-xs text-gray-500">{field.description}</p>
           )}
-        />
-      )
+        </div>
+      );
+
     default:
-      return null
+      return <div>Field type not supported: {field.variant}</div>;
   }
-}
+};

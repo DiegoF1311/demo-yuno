@@ -1,6 +1,5 @@
 import * as Locales from "date-fns/locale";
 
-// Define the FormField type
 export type FormFieldType = {
   type: string;
   variant: string;
@@ -26,6 +25,20 @@ export type FormFieldType = {
   locale?: keyof typeof Locales;
   hour12?: boolean;
   className?: string;
+  styles?: {
+    container?: string;
+    label?: string;
+    input?: string;
+    button?: string;
+    description?: string;
+    colors?: {
+      primary?: string;
+      secondary?: string;
+      text?: string;
+      border?: string;
+      background?: string;
+    };
+  };
 };
 
 export type FieldType = { name: string; isNew: boolean; index?: number };
@@ -33,7 +46,7 @@ export type FieldType = { name: string; isNew: boolean; index?: number };
 export interface EditorColumn {
   id: string;
   content: string;
-  width: number; // 1-12 representing tailwind grid columns
+  width: number;
 }
 
 export interface EditorBlock {

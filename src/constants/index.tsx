@@ -1,137 +1,115 @@
-import { FieldType } from '@/types'
+import { FieldType } from "@/types";
 
 export const FORM_LIBRARIES = {
-  SERVER_ACTIONS: 'server-actions',
-  REACT_HOOK_FORM: 'react-hook-form',
-  TANSTACK_FORM: 'tanstack-form',
-  BRING_YOUR_OWN: 'bring-your-own',
-} as const
+  SERVER_ACTIONS: "server-actions",
+  REACT_HOOK_FORM: "react-hook-form",
+  TANSTACK_FORM: "tanstack-form",
+  BRING_YOUR_OWN: "bring-your-own",
+} as const;
 
-export type FormLibrary = typeof FORM_LIBRARIES[keyof typeof FORM_LIBRARIES]
+export type FormLibrary = (typeof FORM_LIBRARIES)[keyof typeof FORM_LIBRARIES];
 
 export const FORM_LIBRARY_LABELS = {
-  [FORM_LIBRARIES.SERVER_ACTIONS]: 'Server Actions',
-  [FORM_LIBRARIES.REACT_HOOK_FORM]: 'React Hook Form',
-  [FORM_LIBRARIES.TANSTACK_FORM]: 'TanStack Form',
-  [FORM_LIBRARIES.BRING_YOUR_OWN]: 'Bring Your Own Form',
-}
+  [FORM_LIBRARIES.SERVER_ACTIONS]: "Server Actions",
+  [FORM_LIBRARIES.REACT_HOOK_FORM]: "React Hook Form",
+  [FORM_LIBRARIES.TANSTACK_FORM]: "TanStack Form",
+  [FORM_LIBRARIES.BRING_YOUR_OWN]: "Bring Your Own Form",
+};
 
 export const fieldTypes: FieldType[] = [
-  { name: 'Checkbox', isNew: false },
-  { name: 'Combobox', isNew: false },
-  { name: 'Date Picker', isNew: false },
-  { name: 'Datetime Picker', isNew: false },
-  { name: 'File Input', isNew: false },
-  { name: 'Input', isNew: false },
-  { name: 'Input OTP', isNew: false },
-  { name: 'Location Input', isNew: false },
-  { name: 'Multi Select', isNew: false },
-  { name: 'Password', isNew: false },
-  { name: 'Phone', isNew: false },
-  { name: 'Select', isNew: false },
-  { name: 'Signature Input', isNew: false },
-  { name: 'Signature Pad', isNew: true },
-  { name: 'Slider', isNew: false },
-  { name: 'Smart Datetime Input', isNew: false },
-  { name: 'Switch', isNew: false },
-  { name: 'Tags Input', isNew: false },
-  { name: 'Textarea', isNew: false },
-  { name: 'Rating', isNew: false },
-  { name: 'RadioGroup', isNew: false },
-  { name: 'Credit Card', isNew: false },
-]
+  { name: "Input", isNew: false },
+  { name: "Email", isNew: false },
+  { name: "Phone", isNew: false },
+  { name: "Select", isNew: false },
+  { name: "Multi Select", isNew: false },
+  { name: "Payment Method", isNew: false },
+  { name: "Credit Card", isNew: false },
+  { name: "Date Picker", isNew: false },
+  { name: "Textarea", isNew: false },
+  { name: "Checkbox", isNew: false },
+  { name: "Input OTP", isNew: false },
+  { name: "Combobox", isNew: false },
+  { name: "Switch", isNew: false },
+  { name: "Coupon Code", isNew: true },
+  { name: "Amount Input", isNew: true },
+  { name: "Currency Select", isNew: true },
+];
 
 export const defaultFieldConfig: Record<
   string,
   { label: string; description: string; placeholder?: any }
 > = {
-  Checkbox: {
-    label: 'Use different settings for my mobile devices',
-    description:
-      'You can manage your mobile notifications in the mobile settings page.',
-  },
-  Combobox: {
-    label: 'Language',
-    description: 'This is the language that will be used in the dashboard.',
-  },
-  'Date Picker': {
-    label: 'Date of birth',
-    description: 'Your date of birth is used to calculate your age.',
-  },
-  'Datetime Picker': {
-    label: 'Submission Date',
-    description: 'Add the date of submission with detailly.',
-  },
-  'File Input': {
-    label: 'Select File',
-    description: 'Select a file to upload.',
-  },
   Input: {
-    label: 'Username',
-    description: 'This is your public display name.',
-    placeholder: 'shadcn',
+    label: "Full Name",
+    description: "Enter your full name.",
+    placeholder: "John Doe",
   },
-  'Input OTP': {
-    label: 'One-Time Password',
-    description: 'Please enter the one-time password sent to your phone.',
-  },
-  'Location Input': {
-    label: 'Select Country',
-    description:
-      'If your country has states, it will be appear after selecting country',
-  },
-  'Multi Select': {
-    label: 'Select your framework',
-    description: 'Select multiple options.',
-  },
-  Select: {
-    label: 'Email',
-    description: 'You can manage email addresses in your email settings.',
-    placeholder: 'Select a verified email to display',
-  },
-  Slider: {
-    label: 'Set Price Range',
-    description: 'Adjust the price by sliding.',
-  },
-  'Signature Input': {
-    label: 'Sign here',
-    description: 'Please provide your signature above',
-  },
-  'Signature Pad': {
-    label: 'Your Signature',
-    description: 'Click the pen button to sign',
-  },
-  'Smart Datetime Input': {
-    label: "What's the best time for you?",
-    description: 'Please select the full time',
-  },
-  Switch: {
-    label: 'Marketing emails',
-    description: 'Receive emails about new products, features, and more.',
-  },
-  'Tags Input': { label: 'Enter your tech stack.', description: 'Add tags.' },
-  Textarea: {
-    label: 'Bio',
-    description: 'You can @mention other users and organizations.',
-  },
-  Password: {
-    label: 'Password',
-    description: 'Enter your password.',
+  Email: {
+    label: "Email Address",
+    description: "We will send your receipt to this email.",
+    placeholder: "john@example.com",
   },
   Phone: {
-    label: 'Phone number',
-    description: 'Enter your phone number.',
+    label: "Phone Number",
+    description: "Contact number for billing.",
+    placeholder: "+1 (555) 000-0000",
   },
-  Rating: {
-    label: 'Rating',
-    description: 'Please provide your rating.',
+  Select: {
+    label: "Billing Country",
+    description: "Select your country for billing.",
+    placeholder: "Select a country",
   },
-  RadioGroup: {
-    label: 'Gender',
-    description: 'Select your gender',
+  "Multi Select": {
+    label: "Payment Options",
+    description: "Select additional payment options.",
   },
-  'Credit Card': {
-    label: 'Credit Card Information',
-    description: 'Enter your credit card details for payment.',
+  "Payment Method": {
+    label: "Payment Method",
+    description: "Choose your preferred payment method.",
+    placeholder: "Select payment method",
   },
-}
+  "Credit Card": {
+    label: "Card Details",
+    description: "Enter your credit card information.",
+  },
+  "Date Picker": {
+    label: "Transaction Date",
+    description: "Select the date for this payment.",
+  },
+  Textarea: {
+    label: "Billing Address",
+    description: "Enter your complete billing address.",
+    placeholder: "Street, City, State, ZIP",
+  },
+  Checkbox: {
+    label: "I agree to the payment terms",
+    description: "Please review and accept our terms.",
+  },
+  "Input OTP": {
+    label: "Verification Code",
+    description: "Enter the verification code sent to your email.",
+  },
+  Combobox: {
+    label: "State/Province",
+    description: "Search and select your state.",
+  },
+  Switch: {
+    label: "Same as billing address",
+    description: "Use the same address for billing.",
+  },
+  "Coupon Code": {
+    label: "Discount Code",
+    description: "Enter a coupon or promo code.",
+    placeholder: "PROMO2024",
+  },
+  "Amount Input": {
+    label: "Payment Amount",
+    description: "Enter the amount to be charged.",
+    placeholder: "0.00",
+  },
+  "Currency Select": {
+    label: "Currency",
+    description: "Select your preferred currency.",
+    placeholder: "Select currency",
+  },
+};

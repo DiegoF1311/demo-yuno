@@ -49,11 +49,6 @@ export const FieldSelector: React.FC<FieldSelectorProps> = ({
           />
         </div>
       ))}
-      <Link href="https://shadcnform.featurebase.app/" target="_blank">
-        <Button className="rounded-full" size="sm">
-          Request
-        </Button>
-      </Link>
     </div>
   );
 };
