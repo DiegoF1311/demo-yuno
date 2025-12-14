@@ -9,6 +9,7 @@ import { EditFieldDialog } from "@/components/screens/edit-field-dialog";
 import { FieldSelector } from "@/components/screens/field-selector";
 import { FormFieldList } from "@/components/screens/form-field-list";
 import { FormPreview } from "@/components/screens/form-preview";
+import { Button } from "@/components/ui/button";
 import If from "@/components/ui/if";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -123,6 +124,38 @@ export default function FormBuilder() {
     setIsDialogOpen(false);
   };
 
+  const handleSaveForm = async () => {
+    try {
+      const jsonString = JSON.stringify(formFields);
+      console.log("Sending data:", jsonString);
+      
+      const response = await fetch("http://localhost:8080/api/payments/style", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        mode: "cors",
+        body: jsonString,
+      });
+      
+      console.log("Response status:", response.status);
+      
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Success:", result);
+        alert("Form saved successfully!");
+      } else {
+        const errorText = await response.text();
+        console.error("Failed to save form:", errorText);
+        alert(`Failed to save form: ${response.status} - ${errorText}`);
+      }
+    } catch (error) {
+      console.error("Error saving form:", error);
+      alert(`Error saving form: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
   const FieldSelectorWithSeparator = ({
     addFormField,
   }: {
@@ -163,6 +196,9 @@ export default function FormBuilder() {
                 selectedLibrary={selectedLibrary}
                 onLibraryChange={setSelectedLibrary}
               />
+              <Button onClick={handleSaveForm} className="w-full">
+                Guardar
+              </Button>
             </div>
           </div>
         )}

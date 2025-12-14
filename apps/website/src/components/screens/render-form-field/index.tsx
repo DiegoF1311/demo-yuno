@@ -69,7 +69,7 @@ const states = [
   { label: "New York", value: "NY" },
 ];
 
-export const renderFormField = (field: FormFieldType) => {
+export const RenderFormField: React.FC<{ field: FormFieldType }> = ({ field }) => {
   const [value, setValue] = useState(field.value || "");
   const [checked, setChecked] = useState<boolean>(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
@@ -996,4 +996,9 @@ export const renderFormField = (field: FormFieldType) => {
     default:
       return <div>Field type not supported: {field.variant}</div>;
   }
+};
+
+// Export the function version for backward compatibility
+export const renderFormField = (field: FormFieldType) => {
+  return <RenderFormField field={field} />;
 };
