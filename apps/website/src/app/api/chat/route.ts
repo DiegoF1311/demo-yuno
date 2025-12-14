@@ -1,4 +1,5 @@
 import { anthropic } from "@ai-sdk/anthropic";
+import Firecrawl from "@mendable/firecrawl-js";
 import {
   convertToModelMessages,
   stepCountIs,
@@ -8,7 +9,8 @@ import {
 } from "ai";
 import { z } from "zod";
 import { getDevServer } from "@/actions/dev-server";
-import { scrapeTool } from "firecrawl-aisdk";
+
+const firecrawl = new Firecrawl({ apiKey: process.env.FIRECRAWL_API_KEY! });
 
 export type ChatMessage = UIMessage;
 
@@ -22,7 +24,19 @@ export async function POST(req: Request) {
   const devServer = await getDevServer(repoId);
 
   const tools = {
-    scrapeTool,
+    scrapeTool: tool({
+      description: "Scrape content from a URL",
+      inputSchema: z.object({
+        url: z.string().describe("URL to scrape content from"),
+      }),
+      execute: async ({ url }) => {
+        const content = await firecrawl.scrape(url, {
+          formats: ["branding", "markdown", "screenshot"],
+        });
+        return content;
+      },
+    }),
+
     readFile: tool({
       description: "Read a file from the dev server",
       inputSchema: z.object({
@@ -118,7 +132,8 @@ export async function POST(req: Request) {
     model: anthropic("claude-haiku-4-5"),
     maxRetries: 2,
     system:
-      "You are an AI App Builder. The existing app is in the /template directory. Please edit the app how the user wants and commit the changes incrementally.",
+      "You are an AI App CheckOuts Builder. Generate CheckOuts ui. The existing app is in the /template directory. Please edit the app how the user wants and commit the changes incrementally." +
+      "Try to avoid generate multiple componets, try to use only page.tsx",
     messages: convertToModelMessages(messages),
     tools,
     abortSignal: AbortSignal.timeout(120000),

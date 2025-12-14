@@ -8,7 +8,7 @@ export default defineConfig({
       client: "fetch",
       biome: true,
       clean: true,
-      baseUrl: "http://52.15.192.69:8080",
+      baseUrl: "http://52.15.192.69:8080/",
     },
   },
 });

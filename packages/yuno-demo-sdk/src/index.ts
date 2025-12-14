@@ -4,104 +4,114 @@
  * OpenAPI definition
  * OpenAPI spec version: v0
  */
-export interface StartPaymentDTO {
-  'customer-id'?: string;
+export interface StartPaymentRequest {
   amount?: number;
   currency?: string;
+  customerId?: string;
 }
 
-export interface TransactionTokenDTO {
-  token?: string;
-}
-
-export interface PaymentStatusDTO {
+export interface StartPaymentResponse {
+  paymentId?: string;
   status?: string;
+  redirectUrl?: string;
 }
+
+export interface ContinuePaymentRequest {
+  paymentId?: string;
+  paymentMethodToken?: string;
+}
+
+export interface PaymentStatusResponse {
+  paymentId?: string;
+  status?: string;
+  lastUpdated?: string;
+}
+
+export type SaveStyle200 = {[key: string]: { [key: string]: unknown }};
 
 /**
- * Save the JSON about the specs of the config of the UI element
- * @summary Save JSON to render the UI
+ * Returns a list of all registered users
+ * @summary Get all users
  */
-export type createStyleResponse200 = {
+export type getAllUsersResponse200 = {
   data: string
   status: 200
 }
     
-export type createStyleResponseSuccess = (createStyleResponse200) & {
+export type getAllUsersResponseSuccess = (getAllUsersResponse200) & {
   headers: Headers;
 };
 ;
 
-export type createStyleResponse = (createStyleResponseSuccess)
+export type getAllUsersResponse = (getAllUsersResponseSuccess)
 
-export const getCreateStyleUrl = () => {
+export const getGetAllUsersUrl = () => {
 
 
   
 
-  return `http://52.15.192.69:8080/api/payments/style`
+  return `http://52.15.192.69:8080/api/users`
 }
 
-export const createStyle = async (createStyleBody: string, options?: RequestInit): Promise<createStyleResponse> => {
+export const getAllUsers = async ( options?: RequestInit): Promise<getAllUsersResponse> => {
   
-  const res = await fetch(getCreateStyleUrl(),
+  const res = await fetch(getGetAllUsersUrl(),
   {      
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      createStyleBody,)
+    method: 'GET'
+    
+    
   }
 )
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: createStyleResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as createStyleResponse
+  const data: getAllUsersResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getAllUsersResponse
 }
 
 
 
 /**
- * Initiates a new payment process and return the token of the transaction
- * @summary Start a payment
+ * Adds a new user to the list
+ * @summary Create a new user
  */
-export type startPaymentResponse200 = {
-  data: TransactionTokenDTO
+export type createUserResponse200 = {
+  data: string
   status: 200
 }
     
-export type startPaymentResponseSuccess = (startPaymentResponse200) & {
+export type createUserResponseSuccess = (createUserResponse200) & {
   headers: Headers;
 };
 ;
 
-export type startPaymentResponse = (startPaymentResponseSuccess)
+export type createUserResponse = (createUserResponseSuccess)
 
-export const getStartPaymentUrl = () => {
+export const getCreateUserUrl = () => {
 
 
   
 
-  return `http://52.15.192.69:8080/api/payments/start`
+  return `http://52.15.192.69:8080/api/users`
 }
 
-export const startPayment = async (startPaymentDTO: StartPaymentDTO, options?: RequestInit): Promise<startPaymentResponse> => {
+export const createUser = async (createUserBody: string, options?: RequestInit): Promise<createUserResponse> => {
   
-  const res = await fetch(getStartPaymentUrl(),
+  const res = await fetch(getCreateUserUrl(),
   {      
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(
-      startPaymentDTO,)
+      createUserBody,)
   }
 )
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
   
-  const data: startPaymentResponse['data'] = body ? JSON.parse(body) : {}
-  return { data, status: res.status, headers: res.headers } as startPaymentResponse
+  const data: createUserResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as createUserResponse
 }
 
 
@@ -122,17 +132,17 @@ export type getStyleResponseSuccess = (getStyleResponse200) & {
 
 export type getStyleResponse = (getStyleResponseSuccess)
 
-export const getGetStyleUrl = (publicKey: string,) => {
+export const getGetStyleUrl = () => {
 
 
   
 
-  return `http://52.15.192.69:8080/api/payments/style/${publicKey}`
+  return `http://52.15.192.69:8080/api/payments/style`
 }
 
-export const getStyle = async (publicKey: string, options?: RequestInit): Promise<getStyleResponse> => {
+export const getStyle = async ( options?: RequestInit): Promise<getStyleResponse> => {
   
-  const res = await fetch(getGetStyleUrl(publicKey),
+  const res = await fetch(getGetStyleUrl(),
   {      
     ...options,
     method: 'GET'
@@ -150,11 +160,186 @@ export const getStyle = async (publicKey: string, options?: RequestInit): Promis
 
 
 /**
+ * Saves the styling configuration for the payment interface
+ * @summary Save payment style
+ */
+export type saveStyleResponse200 = {
+  data: SaveStyle200
+  status: 200
+}
+    
+export type saveStyleResponseSuccess = (saveStyleResponse200) & {
+  headers: Headers;
+};
+;
+
+export type saveStyleResponse = (saveStyleResponseSuccess)
+
+export const getSaveStyleUrl = () => {
+
+
+  
+
+  return `http://52.15.192.69:8080/api/payments/style`
+}
+
+export const saveStyle = async (saveStyleBody: string, options?: RequestInit): Promise<saveStyleResponse> => {
+  
+  const res = await fetch(getSaveStyleUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      saveStyleBody,)
+  }
+)
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: saveStyleResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as saveStyleResponse
+}
+
+
+
+/**
+ * Initiates a new payment process
+ * @summary Start a payment
+ */
+export type startPaymentResponse200 = {
+  data: StartPaymentResponse
+  status: 200
+}
+    
+export type startPaymentResponseSuccess = (startPaymentResponse200) & {
+  headers: Headers;
+};
+;
+
+export type startPaymentResponse = (startPaymentResponseSuccess)
+
+export const getStartPaymentUrl = () => {
+
+
+  
+
+  return `http://52.15.192.69:8080/api/payments/start`
+}
+
+export const startPayment = async (startPaymentRequest: StartPaymentRequest, options?: RequestInit): Promise<startPaymentResponse> => {
+  
+  const res = await fetch(getStartPaymentUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      startPaymentRequest,)
+  }
+)
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: startPaymentResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as startPaymentResponse
+}
+
+
+
+/**
+ * Continues an existing payment with a method token
+ * @summary Continue a payment
+ */
+export type continuePaymentResponse200 = {
+  data: PaymentStatusResponse
+  status: 200
+}
+    
+export type continuePaymentResponseSuccess = (continuePaymentResponse200) & {
+  headers: Headers;
+};
+;
+
+export type continuePaymentResponse = (continuePaymentResponseSuccess)
+
+export const getContinuePaymentUrl = () => {
+
+
+  
+
+  return `http://52.15.192.69:8080/api/payments/continue`
+}
+
+export const continuePayment = async (continuePaymentRequest: ContinuePaymentRequest, options?: RequestInit): Promise<continuePaymentResponse> => {
+  
+  const res = await fetch(getContinuePaymentUrl(),
+  {      
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      continuePaymentRequest,)
+  }
+)
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: continuePaymentResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as continuePaymentResponse
+}
+
+
+
+/**
+ * Returns a single user
+ * @summary Get a user by name
+ */
+export type getUserResponse200 = {
+  data: string
+  status: 200
+}
+    
+export type getUserResponseSuccess = (getUserResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getUserResponse = (getUserResponseSuccess)
+
+export const getGetUserUrl = (name: string,) => {
+
+
+  
+
+  return `http://52.15.192.69:8080/api/users/${name}`
+}
+
+export const getUser = async (name: string, options?: RequestInit): Promise<getUserResponse> => {
+  
+  const res = await fetch(getGetUserUrl(name),
+  {      
+    ...options,
+    method: 'GET'
+    
+    
+  }
+)
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+  
+  const data: getUserResponse['data'] = body ? JSON.parse(body) : {}
+  return { data, status: res.status, headers: res.headers } as getUserResponse
+}
+
+
+
+/**
  * Retrieves the current status of a payment
  * @summary Check payment status
  */
 export type checkStatusResponse200 = {
-  data: PaymentStatusDTO
+  data: PaymentStatusResponse
   status: 200
 }
     
@@ -189,39 +374,3 @@ export const checkStatus = async (paymentId: string, options?: RequestInit): Pro
   const data: checkStatusResponse['data'] = body ? JSON.parse(body) : {}
   return { data, status: res.status, headers: res.headers } as checkStatusResponse
 }
-
-/**
- * Render the payment form with the style configuration
- * @summary Render payment form
- */
-export interface YunoSDK {
-  render: (containerId: string, publicKey: string) => Promise<void>;
-}
-
-export const Yuno: YunoSDK = {
-  render: async (containerId: string, publicKey: string) => {
-    try {
-      const response = await getStyle(publicKey);
-      const formFields = response.data;
-      
-      const container = document.getElementById(containerId);
-      if (!container) {
-        throw new Error(`Container with id "${containerId}" not found`);
-      }
-      
-      // This will be implemented by the integrator using React
-      // For now, we just store the data in a data attribute
-      container.setAttribute('data-form-fields', JSON.stringify(formFields));
-      container.setAttribute('data-public-key', publicKey);
-      
-      // Dispatch a custom event that the React app can listen to
-      const event = new CustomEvent('yunoFormReady', {
-        detail: { formFields, publicKey }
-      });
-      window.dispatchEvent(event);
-    } catch (error) {
-      console.error('Error rendering Yuno form:', error);
-      throw error;
-    }
-  }
-};
