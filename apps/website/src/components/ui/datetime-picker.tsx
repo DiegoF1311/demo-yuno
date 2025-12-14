@@ -1,9 +1,10 @@
 "use client";
 import React, { forwardRef, useCallback, useState } from "react";
-import { useTimescape, type Options } from "timescape/react";
+import { type Options, useTimescape } from "timescape/react";
 
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+
 // @source: https://github.com/dan-lee/timescape?tab=readme-ov-file
 
 const timePickerInputBase =
@@ -73,10 +74,10 @@ const DatetimeGrid = forwardRef<
         {...timescape.getRootProps()}
         ref={ref}
       >
-        {!!format?.length
+        {format?.length
           ? format.map((group, i) => (
               <React.Fragment key={i === 0 ? "dates" : "times"}>
-                {!!group?.length
+                {group?.length
                   ? group.map((unit, j) => (
                       <React.Fragment key={unit}>
                         <Input

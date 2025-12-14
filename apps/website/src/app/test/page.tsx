@@ -1,10 +1,12 @@
+/** biome-ignore-all lint/correctness/useExhaustiveDependencies: <x> */
 "use client";
 
-import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { RenderFormField } from "@/components/screens/render-form-field";
+import { ColorPickerFormDemo } from "@/components/theme-picker";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,7 +17,6 @@ import {
 } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import type { FormFieldType } from "@/types";
-import { ColorPickerFormDemo } from "@/components/theme-picker";
 
 const STORAGE_KEY = "local-theme-config";
 
@@ -38,7 +39,9 @@ export default function Page() {
 
   const handleApiRequest = async () => {
     try {
-      const response = await fetch("http://52.15.192.69:8080/api/payments/style");
+      const response = await fetch(
+        "http://52.15.192.69:8080/api/payments/style",
+      );
       const data = await response.json();
       setApiResponse(JSON.stringify(data, null, 2));
       if (Array.isArray(data)) {
@@ -60,13 +63,16 @@ export default function Page() {
   });
 
   return (
-    <div className="flex items-center justify-center min-h-screen gap-4">
+    <div className="flex flex-col items-center justify-center min-h-screen gap-8 p-4">
       <ColorPickerFormDemo onSave={saveTheme} />
-      <div style={themeVars as React.CSSProperties}>
+      <div
+        style={themeVars as React.CSSProperties}
+        className="w-full flex justify-center"
+      >
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Formulario</CardTitle>
-            <CardDescription>Completa los campos requeridos</CardDescription>
+            <CardTitle>Checkout</CardTitle>
+            <CardDescription>Complete your payment</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>

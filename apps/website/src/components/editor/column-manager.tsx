@@ -1,25 +1,25 @@
-'use client'
+"use client";
 
-import { Input } from '@/components/ui/input'
-import { Plus, Minus } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Minus, Plus } from "lucide-react";
+import * as React from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip'
-import * as React from 'react'
-import { EditorColumn } from '@/types'
+} from "@/components/ui/tooltip";
+import type { EditorColumn } from "@/types";
 
 interface ColumnManagerProps {
-  blockId: string
-  columns: EditorColumn[]
-  onColumnChange?: (columns: EditorColumn[]) => void
+  blockId: string;
+  columns: EditorColumn[];
+  onColumnChange?: (columns: EditorColumn[]) => void;
   onKeyDown?: (
     e: React.KeyboardEvent<HTMLInputElement>,
     columnId: string,
-  ) => void
+  ) => void;
 }
 
 export function ColumnManager({
@@ -31,56 +31,56 @@ export function ColumnManager({
   const totalWidth = React.useMemo(
     () => columns.reduce((acc, col) => acc + col.width, 0),
     [columns],
-  )
+  );
 
   const handleColumnChange = (newColumns: EditorColumn[]) => {
     if (onColumnChange) {
-      onColumnChange(newColumns)
+      onColumnChange(newColumns);
     }
-  }
+  };
 
   const addColumn = () => {
-    if (totalWidth >= 12) return
+    if (totalWidth >= 12) return;
     const newColumn: EditorColumn = {
       id: Math.random().toString(36).substr(2, 9),
-      content: '',
+      content: "",
       width: Math.min(12 - totalWidth, 6),
-    }
-    handleColumnChange([...columns, newColumn])
-  }
+    };
+    handleColumnChange([...columns, newColumn]);
+  };
 
   const removeColumn = (id: string) => {
-    if (columns.length <= 1) return
-    handleColumnChange(columns.filter((col) => col.id !== id))
-  }
+    if (columns.length <= 1) return;
+    handleColumnChange(columns.filter((col) => col.id !== id));
+  };
 
   const adjustWidth = (id: string, increment: boolean) => {
     const newColumns = columns.map((col) => {
       if (col.id === id) {
-        const newWidth = increment ? col.width + 1 : col.width - 1
-        if (newWidth < 1 || newWidth > 12) return col
+        const newWidth = increment ? col.width + 1 : col.width - 1;
+        if (newWidth < 1 || newWidth > 12) return col;
 
         const potentialTotalWidth = columns.reduce(
           (acc, c) => (c.id === id ? acc + newWidth : acc + c.width),
           0,
-        )
+        );
 
-        if (potentialTotalWidth > 12) return col
+        if (potentialTotalWidth > 12) return col;
 
-        return { ...col, width: newWidth }
+        return { ...col, width: newWidth };
       }
-      return col
-    })
+      return col;
+    });
 
-    handleColumnChange(newColumns)
-  }
+    handleColumnChange(newColumns);
+  };
 
   const updateColumnContent = (id: string, content: string) => {
     const newColumns = columns.map((col) =>
       col.id === id ? { ...col, content } : col,
-    )
-    handleColumnChange(newColumns)
-  }
+    );
+    handleColumnChange(newColumns);
+  };
 
   return (
     <div className="w-full space-y-2">
@@ -161,5 +161,5 @@ export function ColumnManager({
         </Tooltip>
       </TooltipProvider>
     </div>
-  )
+  );
 }

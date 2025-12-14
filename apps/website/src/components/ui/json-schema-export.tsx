@@ -1,54 +1,70 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Textarea } from '@/components/ui/textarea'
-import { Copy, Download } from 'lucide-react'
-import { toast } from 'sonner'
-import { generateFormJsonSchema, downloadJsonSchema } from '@/lib/json-schema-generator'
+import { Copy, Download } from "lucide-react";
+import React, { useState } from "react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  downloadJsonSchema,
+  generateFormJsonSchema,
+} from "@/lib/json-schema-generator";
 
 interface JsonSchemaExportProps {
-  formFields: any[]
-  title?: string
-  description?: string
+  formFields: any[];
+  title?: string;
+  description?: string;
 }
 
-export function JsonSchemaExport({ formFields, title = 'Form Schema', description = 'Generated JSON Schema' }: JsonSchemaExportProps) {
-  const [jsonSchema, setJsonSchema] = useState<string>('')
-  const [isGenerated, setIsGenerated] = useState(false)
+export function JsonSchemaExport({
+  formFields,
+  title = "Form Schema",
+  description = "Generated JSON Schema",
+}: JsonSchemaExportProps) {
+  const [jsonSchema, setJsonSchema] = useState<string>("");
+  const [isGenerated, setIsGenerated] = useState(false);
 
   const generateSchema = () => {
     try {
-      const schema = generateFormJsonSchema(formFields, { title, description })
-      const schemaString = JSON.stringify(schema, null, 2)
-      setJsonSchema(schemaString)
-      setIsGenerated(true)
-      toast.success('JSON Schema generated successfully!')
+      const schema = generateFormJsonSchema(formFields, { title, description });
+      const schemaString = JSON.stringify(schema, null, 2);
+      setJsonSchema(schemaString);
+      setIsGenerated(true);
+      toast.success("JSON Schema generated successfully!");
     } catch (error) {
-      toast.error('Failed to generate JSON Schema')
-      console.error('Schema generation error:', error)
+      toast.error("Failed to generate JSON Schema");
+      console.error("Schema generation error:", error);
     }
-  }
+  };
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(jsonSchema)
-      toast.success('JSON Schema copied to clipboard!')
+      await navigator.clipboard.writeText(jsonSchema);
+      toast.success("JSON Schema copied to clipboard!");
     } catch (error) {
-      toast.error('Failed to copy to clipboard')
+      toast.error("Failed to copy to clipboard");
     }
-  }
+  };
 
   const downloadSchema = () => {
     try {
-      const schema = JSON.parse(jsonSchema)
-      downloadJsonSchema(schema, `${title.toLowerCase().replace(/\s+/g, '-')}-schema.json`)
-      toast.success('JSON Schema downloaded!')
+      const schema = JSON.parse(jsonSchema);
+      downloadJsonSchema(
+        schema,
+        `${title.toLowerCase().replace(/\s+/g, "-")}-schema.json`,
+      );
+      toast.success("JSON Schema downloaded!");
     } catch (error) {
-      toast.error('Failed to download schema')
+      toast.error("Failed to download schema");
     }
-  }
+  };
 
   return (
     <Card className="w-full">
@@ -76,7 +92,7 @@ export function JsonSchemaExport({ formFields, title = 'Form Schema', descriptio
             </>
           )}
         </div>
-        
+
         {isGenerated && (
           <Textarea
             value={jsonSchema}
@@ -85,7 +101,7 @@ export function JsonSchemaExport({ formFields, title = 'Form Schema', descriptio
             placeholder="Generated JSON Schema will appear here..."
           />
         )}
-        
+
         {formFields.length === 0 && (
           <p className="text-sm text-muted-foreground">
             Add form fields to generate a JSON Schema
@@ -93,5 +109,5 @@ export function JsonSchemaExport({ formFields, title = 'Form Schema', descriptio
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

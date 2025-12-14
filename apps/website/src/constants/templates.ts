@@ -1,54 +1,54 @@
 export interface Templates {
-  title: string
-  description: string
-  path: string
-  sub: any[]
+  title: string;
+  description: string;
+  path: string;
+  sub: any[];
 }
 
 export const templates: Templates[] = [
   {
-    title: 'Authentication',
+    title: "Authentication",
     description:
-      'Contains forms for login, registration, password recovery, and related authentication processes.',
-    path: '/templates/authentication',
+      "Contains forms for login, registration, password recovery, and related authentication processes.",
+    path: "/templates/authentication",
     sub: [
       {
-        title: 'Login',
-        path: '/templates/authentication/login',
-        description: 'Login template',
+        title: "Login",
+        path: "/templates/authentication/login",
+        description: "Login template",
       },
       {
-        title: 'Register',
-        path: '/templates/authentication/register',
-        description: 'Register template',
+        title: "Register",
+        path: "/templates/authentication/register",
+        description: "Register template",
       },
       {
-        title: 'Forgot Password',
-        path: '/templates/authentication/forgot-password',
-        description: 'Login template',
+        title: "Forgot Password",
+        path: "/templates/authentication/forgot-password",
+        description: "Login template",
       },
       {
-        title: 'Reset Password',
-        path: '/templates/authentication/reset-password',
-        description: 'Login template',
+        title: "Reset Password",
+        path: "/templates/authentication/reset-password",
+        description: "Login template",
       },
     ],
   },
   {
-    title: 'Contact',
+    title: "Contact",
     description:
-      'Includes contact forms for user inquiries, feedback, and general communication.',
-    path: '/templates/contact',
+      "Includes contact forms for user inquiries, feedback, and general communication.",
+    path: "/templates/contact",
     sub: [
       {
-        title: 'Contact',
-        path: '/templates/contact/contact',
-        description: 'Contact form template',
+        title: "Contact",
+        path: "/templates/contact/contact",
+        description: "Contact form template",
       },
       {
-        title: 'Newsletter',
-        path: '/templates/contact/newsletter',
-        description: 'Newsletter form template',
+        title: "Newsletter",
+        path: "/templates/contact/newsletter",
+        description: "Newsletter form template",
       },
       // {
       //   title: 'register',
@@ -99,4 +99,4 @@ export const templates: Templates[] = [
   //     },
   //   ],
   // },
-]
+];

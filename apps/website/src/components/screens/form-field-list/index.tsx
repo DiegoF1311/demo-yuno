@@ -1,10 +1,10 @@
-import React, { useState, useCallback } from "react";
-import { Reorder, AnimatePresence } from "framer-motion";
-import { FormFieldType } from "@/types";
-import { FieldItem } from "@/components/screens/field-item";
-
+import { AnimatePresence, Reorder } from "framer-motion";
+import type React from "react";
+import { useCallback, useState } from "react";
 import { LuRows2 } from "react-icons/lu";
+import { FieldItem } from "@/components/screens/field-item";
 import { Badge } from "@/components/ui/badge";
+import type { FormFieldType } from "@/types";
 
 export type FormFieldOrGroup = FormFieldType | FormFieldType[];
 

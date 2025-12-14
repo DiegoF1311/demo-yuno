@@ -1,23 +1,9 @@
-import React, { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { format } from "date-fns";
+import type React from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Command,
   CommandEmpty,
@@ -25,13 +11,28 @@ import {
   CommandInput,
   CommandItem,
 } from "@/components/ui/command";
+import { Input } from "@/components/ui/input";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import type { FormFieldType } from "@/types";
-import { format } from "date-fns";
 
 const countries = [
   { label: "United States", value: "US" },
@@ -69,7 +70,9 @@ const states = [
   { label: "New York", value: "NY" },
 ];
 
-export const RenderFormField: React.FC<{ field: FormFieldType }> = ({ field }) => {
+export const RenderFormField: React.FC<{ field: FormFieldType }> = ({
+  field,
+}) => {
   const [value, setValue] = useState(field.value || "");
   const [checked, setChecked] = useState<boolean>(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] =

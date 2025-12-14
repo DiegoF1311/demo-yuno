@@ -673,7 +673,7 @@ const DateTimeLocalInput = ({
             className={cn("peer flex justify-end", inputBase, className)}
             mode="single"
             selected={value ?? undefined}
-            // @ts-ignore
+            // @ts-expect-error
             onSelect={formateSelectedDate}
             initialFocus
           />

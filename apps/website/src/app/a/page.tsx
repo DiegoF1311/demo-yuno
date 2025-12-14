@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { Yuno } from "yuno-demo-sdk";
 import { z } from "zod";
 import { RenderFormField } from "@/components/screens/render-form-field";
+import { ColorPickerFormDemo } from "@/components/theme-picker";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,8 +17,6 @@ import {
 } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import type { FormFieldType } from "@/types";
-import { ColorPickerFormDemo } from "@/components/theme-picker";
-import { Yuno } from "yuno-demo-sdk";
 
 const STORAGE_KEY = "local-theme-config";
 
@@ -42,13 +42,19 @@ export default function CheckoutPage() {
       }
     };
 
-    window.addEventListener('yunoFormReady', handleYunoFormReady as EventListener);
+    window.addEventListener(
+      "yunoFormReady",
+      handleYunoFormReady as EventListener,
+    );
 
     // Initialize Yuno SDK
-    Yuno.render('yuno-checkout', 'demo-public-key');
+    Yuno.render("yuno-checkout", "demo-public-key");
 
     return () => {
-      window.removeEventListener('yunoFormReady', handleYunoFormReady as EventListener);
+      window.removeEventListener(
+        "yunoFormReady",
+        handleYunoFormReady as EventListener,
+      );
     };
   }, []);
 
@@ -88,5 +94,4 @@ export default function CheckoutPage() {
       </div>
     </div>
   );
-}
 }

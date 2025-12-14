@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useState, InputHTMLAttributes } from "react";
+import { forwardRef, type InputHTMLAttributes, useState } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

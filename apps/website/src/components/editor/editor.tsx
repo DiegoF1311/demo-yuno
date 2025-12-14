@@ -1,119 +1,119 @@
-'use client'
+"use client";
 
-import * as React from 'react'
+import { Reorder, useDragControls } from "framer-motion";
+import { GripVertical, MoreVertical } from "lucide-react";
+import * as React from "react";
 import {
   Command,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem as CommandListItem,
   CommandList,
-} from '@/components/ui/command'
-import { GripVertical, MoreVertical } from 'lucide-react'
+  CommandItem as CommandListItem,
+} from "@/components/ui/command";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Reorder, useDragControls } from 'framer-motion'
-import { BlockContent } from './block-content'
-import { EditorBlock, EditorColumn } from '@/types'
+} from "@/components/ui/dropdown-menu";
 import {
+  componentCommands,
   labelCommands,
   layoutCommands,
-  componentCommands,
-} from '@/constants/menu'
+} from "@/constants/menu";
+import type { EditorBlock, EditorColumn } from "@/types";
+import { BlockContent } from "./block-content";
 
-const iconSize = 'h-4 w-4'
+const iconSize = "h-4 w-4";
 
 export default function Editor() {
   const [blocks, setBlocks] = React.useState<EditorBlock[]>([
-    { id: '1', type: 'text', content: '' },
-  ])
-  const [showCommand, setShowCommand] = React.useState(false)
-  const [activeBlockId, setActiveBlockId] = React.useState<string>('1')
-  const dragControls = useDragControls()
+    { id: "1", type: "text", content: "" },
+  ]);
+  const [showCommand, setShowCommand] = React.useState(false);
+  const [activeBlockId, setActiveBlockId] = React.useState<string>("1");
+  const dragControls = useDragControls();
 
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
     blockId: string,
     columnId?: string,
   ) => {
-    if (e.key === '/' && !showCommand) {
-      e.preventDefault()
-      setShowCommand(true)
-      setActiveBlockId(blockId)
-    } else if (e.key === 'Enter') {
-      e.preventDefault()
+    if (e.key === "/" && !showCommand) {
+      e.preventDefault();
+      setShowCommand(true);
+      setActiveBlockId(blockId);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
       const newBlock: EditorBlock = {
         id: Math.random().toString(36).substr(2, 9),
-        type: 'text',
-        content: '',
-      }
+        type: "text",
+        content: "",
+      };
 
       setBlocks((prev) => {
-        const currentIndex = prev.findIndex((block) => block.id === blockId)
-        const newBlocks = [...prev]
-        newBlocks.splice(currentIndex + 1, 0, newBlock)
-        return newBlocks
-      })
+        const currentIndex = prev.findIndex((block) => block.id === blockId);
+        const newBlocks = [...prev];
+        newBlocks.splice(currentIndex + 1, 0, newBlock);
+        return newBlocks;
+      });
     }
-  }
+  };
 
   const handleCommandSelect = (value: string) => {
     const newBlock: EditorBlock = {
       id: Math.random().toString(36).substr(2, 9),
-      type: value as EditorBlock['type'],
-      content: '',
-      ...(value === 'columns'
+      type: value as EditorBlock["type"],
+      content: "",
+      ...(value === "columns"
         ? {
             columns: [
               {
                 id: Math.random().toString(36).substr(2, 9),
-                content: '',
+                content: "",
                 width: 6,
               },
               {
                 id: Math.random().toString(36).substr(2, 9),
-                content: '',
+                content: "",
                 width: 6,
               },
             ],
           }
         : {}),
-    }
+    };
 
     setBlocks((prev) => {
       const activeBlockIndex = prev.findIndex(
         (block) => block.id === activeBlockId,
-      )
-      const newBlocks = [...prev]
-      newBlocks.splice(activeBlockIndex + 1, 0, newBlock)
-      return newBlocks
-    })
+      );
+      const newBlocks = [...prev];
+      newBlocks.splice(activeBlockIndex + 1, 0, newBlock);
+      return newBlocks;
+    });
 
-    setShowCommand(false)
-  }
+    setShowCommand(false);
+  };
 
   const handleContentChange = (id: string, content: string) => {
     setBlocks((prev) =>
       prev.map((block) => (block.id === id ? { ...block, content } : block)),
-    )
-  }
+    );
+  };
 
   const handleColumnChange = (blockId: string, columns: EditorColumn[]) => {
     setBlocks((prev) =>
       prev.map((block) =>
         block.id === blockId ? { ...block, columns } : block,
       ),
-    )
-  }
+    );
+  };
 
   const duplicateBlock = (id: string) => {
-    const blockToDuplicate = blocks.find((block) => block.id === id)
-    if (!blockToDuplicate) return
+    const blockToDuplicate = blocks.find((block) => block.id === id);
+    if (!blockToDuplicate) return;
 
     const newBlock: EditorBlock = {
       ...blockToDuplicate,
@@ -126,22 +126,22 @@ export default function Editor() {
             })),
           }
         : {}),
-    }
+    };
 
     setBlocks((prev) => {
-      const index = prev.findIndex((block) => block.id === id)
-      const newBlocks = [...prev]
-      newBlocks.splice(index + 1, 0, newBlock)
-      return newBlocks
-    })
-  }
+      const index = prev.findIndex((block) => block.id === id);
+      const newBlocks = [...prev];
+      newBlocks.splice(index + 1, 0, newBlock);
+      return newBlocks;
+    });
+  };
 
   const removeBlock = (id: string) => {
     setBlocks((prev) => {
-      if (prev.length <= 1) return prev
-      return prev.filter((block) => block.id !== id)
-    })
-  }
+      if (prev.length <= 1) return prev;
+      return prev.filter((block) => block.id !== id);
+    });
+  };
 
   return (
     <div className="w-full max-w-2xl mx-auto p-4">
@@ -161,7 +161,7 @@ export default function Editor() {
           >
             <div
               className="opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
-              style={{ cursor: 'grab' }}
+              style={{ cursor: "grab" }}
               onPointerDown={(e) => dragControls.start(e)} // Start dragging from the icon
             >
               <GripVertical className="h-4 w-4 text-gray-600 hover:text-gray-800" />
@@ -239,7 +239,7 @@ export default function Editor() {
               <CommandListItem
                 key={component.title}
                 onSelect={() => handleCommandSelect(component.value)}
-                className={component.isNew ? 'font-bold' : ''}
+                className={component.isNew ? "font-bold" : ""}
               >
                 <span className={`mr-2 ${iconSize}`}>{component.icon}</span>
                 {component.title}
@@ -252,5 +252,5 @@ export default function Editor() {
         </CommandList>
       </CommandDialog>
     </div>
-  )
+  );
 }

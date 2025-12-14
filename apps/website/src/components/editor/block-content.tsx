@@ -1,17 +1,17 @@
-'use client'
+"use client";
 
-import { Input } from '@/components/ui/input'
-import { EditorBlock, EditorColumn } from '@/types'
-import { ColumnManager } from './column-manager'
+import { Input } from "@/components/ui/input";
+import type { EditorBlock, EditorColumn } from "@/types";
+import { ColumnManager } from "./column-manager";
 
 interface BlockContentProps {
-  block: EditorBlock
-  onChange: (content: string) => void
+  block: EditorBlock;
+  onChange: (content: string) => void;
   onKeyDown?: (
     e: React.KeyboardEvent<HTMLInputElement>,
     columnId?: string,
-  ) => void
-  onColumnChange?: (columns: EditorColumn[]) => void
+  ) => void;
+  onColumnChange?: (columns: EditorColumn[]) => void;
 }
 
 export function BlockContent({
@@ -20,7 +20,7 @@ export function BlockContent({
   onKeyDown,
   onColumnChange,
 }: BlockContentProps) {
-  if (block.type === 'columns' && block.columns) {
+  if (block.type === "columns" && block.columns) {
     return (
       <ColumnManager
         blockId={block.id}
@@ -28,7 +28,7 @@ export function BlockContent({
         onColumnChange={onColumnChange}
         onKeyDown={onKeyDown}
       />
-    )
+    );
   }
 
   return (
@@ -39,5 +39,5 @@ export function BlockContent({
       placeholder="Type '/' for commands..."
       className="border-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
     />
-  )
+  );
 }

@@ -1,38 +1,25 @@
-import React, { useRef } from "react";
-import { Highlight, themes } from "prism-react-renderer";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
+/** biome-ignore-all lint/suspicious/noArrayIndexKey: <x> */
+"use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Code, Eye } from "lucide-react";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { VscJson as VscJsonIcon } from "react-icons/vsc";
 import { toast } from "sonner";
-
-import { renderFormField } from "@/components/screens/render-form-field";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Form, FormField, FormItem, FormControl } from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
+import type { z } from "zod";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import If from "@/components/ui/if";
-import { FormFieldType } from "@/types";
-import { FormLibrary } from "@/constants";
-
-import { Code, Eye, Files } from "lucide-react";
-import {
-  generateZodSchema,
-  generateFormCode,
   generateDefaultValues,
-  generateFormCodeForLibrary,
+  generateZodSchema,
 } from "@/components/screens/generate-code-parts";
-import { formatJSXCode } from "@/lib/utils";
-import { VscJson } from "react-icons/vsc";
-import { SiReacthookform, SiReactquery } from "react-icons/si";
-import { FaReact } from "react-icons/fa";
+import { renderFormField } from "@/components/screens/render-form-field";
+import { ColorPickerFormDemo } from "@/components/theme-picker";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
+import If from "@/components/ui/if";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { FormLibrary } from "@/constants";
+import type { FormFieldType } from "@/types";
 
 export type FormFieldOrGroup = FormFieldType | FormFieldType[];
 
@@ -45,21 +32,20 @@ export type FormPreviewProps = {
 const renderFormFields = (fields: FormFieldOrGroup[], form: any) => {
   return fields.map((fieldOrGroup, index) => {
     if (Array.isArray(fieldOrGroup)) {
-      // Calculate column span based on number of fields in the group
       const getColSpan = (totalFields: number) => {
         switch (totalFields) {
           case 2:
-            return 6; // Two columns
+            return 6;
           case 3:
-            return 4; // Three columns
+            return 4;
           default:
-            return 12; // Single column or fallback
+            return 12;
         }
       };
 
       return (
         <div key={index} className="grid grid-cols-12 gap-4">
-          {fieldOrGroup.map((field, subIndex) => (
+          {fieldOrGroup.map((field) => (
             <FormField
               key={field.name}
               control={form.control}
@@ -71,9 +57,7 @@ const renderFormFields = (fields: FormFieldOrGroup[], form: any) => {
                   <FormControl>
                     {React.cloneElement(
                       renderFormField(field) as React.ReactElement,
-                      {
-                        ...formField,
-                      },
+                      { ...formField },
                     )}
                   </FormControl>
                 </FormItem>
@@ -82,37 +66,32 @@ const renderFormFields = (fields: FormFieldOrGroup[], form: any) => {
           ))}
         </div>
       );
-    } else {
-      return (
-        <FormField
-          key={index}
-          control={form.control}
-          name={fieldOrGroup.name}
-          render={({ field: formField }) => (
-            <FormItem className="col-span-12">
-              <FormControl>
-                {React.cloneElement(
-                  renderFormField(fieldOrGroup) as React.ReactElement,
-                  {
-                    ...formField,
-                  },
-                )}
-              </FormControl>
-            </FormItem>
-          )}
-        />
-      );
     }
+
+    return (
+      <FormField
+        key={index}
+        control={form.control}
+        name={fieldOrGroup.name}
+        render={({ field: formField }) => (
+          <FormItem>
+            <FormControl>
+              {React.cloneElement(
+                renderFormField(fieldOrGroup) as React.ReactElement,
+                { ...formField },
+              )}
+            </FormControl>
+          </FormItem>
+        )}
+      />
+    );
   });
 };
 
-export const FormPreview: React.FC<FormPreviewProps> = ({
-  formFields,
-  selectedLibrary,
-  onLibraryChange,
-}) => {
-  const formSchema = generateZodSchema(formFields);
+export const FormPreview: React.FC<FormPreviewProps> = ({ formFields }) => {
+  const [themeVars, setThemeVars] = useState<Record<string, string>>({});
 
+  const formSchema = generateZodSchema(formFields);
   const defaultVals = generateDefaultValues(formFields);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -124,171 +103,78 @@ export const FormPreview: React.FC<FormPreviewProps> = ({
     try {
       toast(
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+          <code className="text-white text-xs">
+            {JSON.stringify(data, null, 2)}
+          </code>
         </pre>,
       );
     } catch (error) {
       console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
+      toast.error("Failed to submit the form");
     }
   }
 
-  const generatedCode = generateFormCodeForLibrary(formFields, selectedLibrary);
-  const formattedCode = formatJSXCode(generatedCode);
-
   return (
-    <div className="w-full col-span-1 rounded-xl flex justify-center">
-      <Tabs defaultValue="preview" className="w-full">
-        <div className="flex items-center justify-between">
-          <TabsList>
-            <TabsTrigger value="preview">
-              <div className="flex items-center gap-1">
-                <Eye className="size-4" />{" "}
-                <span className="text-sm">Preview</span>
-              </div>
-            </TabsTrigger>
-            <TabsTrigger value="json">
-              <div className="flex items-center gap-1">
-                <VscJson />
-                <span className="text-sm">JSON</span>
-              </div>
-            </TabsTrigger>
-            <TabsTrigger value="code">
-              <div className="flex items-center gap-1">
-                <Code className="size-4" />
-                <span className="text-sm">Code</span>
-              </div>
-            </TabsTrigger>
-          </TabsList>
-
-          <Select
-            value={selectedLibrary}
-            onValueChange={(value) => onLibraryChange(value as FormLibrary)}
-          >
-            <SelectTrigger className="w-auto px-2 gap-2">
-              <SelectValue placeholder="Select library">
-                {selectedLibrary === "react-hook-form" && (
-                  <SiReacthookform className="size-5 text-[#EC5990]" />
-                )}
-                {selectedLibrary === "tanstack-form" && (
-                  <SiReactquery className="size-5" />
-                )}
-                {selectedLibrary === "server-actions" && (
-                  <FaReact className="size-5 text-blue-500" />
-                )}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Form Libraries</SelectLabel>
-                <SelectItem value="react-hook-form">
-                  <div className="flex items-center gap-2">
-                    <SiReacthookform className="size-4 text-[#EC5990]" />
-                    <span>React Hook Form</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="tanstack-form">
-                  <div className="flex items-center gap-2">
-                    <SiReactquery className="size-4" />
-                    <span>TanStack Form</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="server-actions" disabled>
-                  <div className="flex items-center gap-2">
-                    <FaReact className="size-4 text-blue-500" />
-                    <span>Server Actions (Coming Soon)</span>
-                  </div>
-                </SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+    <div className="w-full space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <h2 className="text-xl font-bold">Preview</h2>
+          <p className="text-sm text-muted-foreground">Live preview</p>
         </div>
-        <TabsContent value="preview" className="space-y-4 overflow-auto">
+        <ColorPickerFormDemo onSave={setThemeVars} />
+      </div>
+
+      <Tabs defaultValue="preview" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="preview" className="gap-2">
+            <Eye className="h-4 w-4" />
+            <span>Preview</span>
+          </TabsTrigger>
+          <TabsTrigger value="json" className="gap-2">
+            <VscJsonIcon className="h-4 w-4" />
+            <span>JSON</span>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="preview" className="space-y-4 mt-4">
           <If
             condition={formFields.length > 0}
             render={() => (
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="space-y-4 py-5 max-w-lg"
-                >
-                  {renderFormFields(formFields, form)}
-                  <Button type="submit">Submit</Button>
-                </form>
-              </Form>
+              <div style={themeVars as React.CSSProperties}>
+                <Form {...form}>
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-5"
+                  >
+                    {renderFormFields(formFields, form)}
+                    <Button type="submit" className="w-full">
+                      Submit
+                    </Button>
+                  </form>
+                </Form>
+              </div>
             )}
             otherwise={() => (
-              <div className="flex justify-center items-center py-8">
-                <p>No form element selected yet.</p>
+              <div className="flex justify-center items-center py-12 text-muted-foreground">
+                <p>No fields yet</p>
               </div>
             )}
           />
         </TabsContent>
-        <TabsContent value="json">
+
+        <TabsContent value="json" className="mt-4">
           <If
             condition={formFields.length > 0}
             render={() => (
-              <pre className="p-4 text-sm bg-secondary rounded-lg overflow-auto">
-                {JSON.stringify(formFields, null, 2)}
-              </pre>
-            )}
-            otherwise={() => (
-              <div className="flex justify-center items-center py-8">
-                <p>No form element selected yet.</p>
-              </div>
-            )}
-          />
-        </TabsContent>
-        <TabsContent value="code">
-          <If
-            condition={formFields.length > 0}
-            render={() => (
-              <div className="relative">
-                <Button
-                  className="absolute right-2 top-2"
-                  variant="secondary"
-                  size="icon"
-                  onClick={() => {
-                    navigator.clipboard.writeText(formattedCode);
-                    toast.success("Code copied to clipboard!");
-                  }}
-                >
-                  <Files />
-                </Button>
-                <Highlight
-                  code={formattedCode}
-                  language="tsx"
-                  theme={themes.oneDark}
-                >
-                  {({
-                    className,
-                    style,
-                    tokens,
-                    getLineProps,
-                    getTokenProps,
-                  }: any) => (
-                    <pre
-                      className={`${className} p-4 text-sm bg-gray-100 rounded-lg overflow-auto`}
-                      style={style}
-                    >
-                      {tokens.map((line: any, i: number) => (
-                        <div key={i} {...getLineProps({ line, key: i })}>
-                          {line.map((token: any, key: any) => (
-                            <span
-                              key={key}
-                              {...getTokenProps({ token, key })}
-                            />
-                          ))}
-                        </div>
-                      ))}
-                    </pre>
-                  )}
-                </Highlight>
+              <div className="bg-secondary rounded-lg p-4 max-h-[400px] overflow-auto">
+                <pre className="text-xs font-mono text-foreground">
+                  {JSON.stringify(formFields, null, 2)}
+                </pre>
               </div>
             )}
             otherwise={() => (
-              <div className="flex justify-center items-center py-8">
-                <p>No form element selected yet.</p>
+              <div className="flex justify-center items-center py-12 text-muted-foreground">
+                <p>No fields yet</p>
               </div>
             )}
           />

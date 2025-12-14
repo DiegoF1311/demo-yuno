@@ -1,8 +1,9 @@
-'use client'
+"use client";
 
-import * as React from 'react'
-import { useEffect, useState, useRef, useCallback } from 'react'
-import { Button } from '@/components/ui/button'
+import { Check, Eraser, Pen, Pencil, RotateCcw } from "lucide-react";
+import type * as React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,38 +11,37 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 // Progress is now inline in the button
-import { cn } from '@/lib/utils'
-import { Eraser, Pen, Check, Pencil, RotateCcw } from 'lucide-react'
+import { cn } from "@/lib/utils";
 
 type SignaturePadProps = {
-  value?: string | null
-  onChange: (signature: string | null) => void
-  disabled?: boolean
-  className?: string
-  holdToSignDuration?: number // Duration in ms to hold for confirming signature
-}
+  value?: string | null;
+  onChange: (signature: string | null) => void;
+  disabled?: boolean;
+  className?: string;
+  holdToSignDuration?: number; // Duration in ms to hold for confirming signature
+};
 
-const CANVAS_WIDTH = 400
-const CANVAS_HEIGHT = 200
-const DEFAULT_HOLD_DURATION = 1500 // 1.5 seconds
+const CANVAS_WIDTH = 400;
+const CANVAS_HEIGHT = 200;
+const DEFAULT_HOLD_DURATION = 1500; // 1.5 seconds
 
 const disableTouchScroll = (canvas: HTMLCanvasElement) => {
   const preventScroll = (e: TouchEvent) => {
-    e.preventDefault()
-  }
+    e.preventDefault();
+  };
 
-  canvas.addEventListener('touchstart', preventScroll, { passive: false })
-  canvas.addEventListener('touchmove', preventScroll, { passive: false })
-  canvas.addEventListener('touchend', preventScroll, { passive: false })
+  canvas.addEventListener("touchstart", preventScroll, { passive: false });
+  canvas.addEventListener("touchmove", preventScroll, { passive: false });
+  canvas.addEventListener("touchend", preventScroll, { passive: false });
 
   return () => {
-    canvas.removeEventListener('touchstart', preventScroll)
-    canvas.removeEventListener('touchmove', preventScroll)
-    canvas.removeEventListener('touchend', preventScroll)
-  }
-}
+    canvas.removeEventListener("touchstart", preventScroll);
+    canvas.removeEventListener("touchmove", preventScroll);
+    canvas.removeEventListener("touchend", preventScroll);
+  };
+};
 
 export default function SignaturePad({
   value,
@@ -50,247 +50,247 @@ export default function SignaturePad({
   className,
   holdToSignDuration = DEFAULT_HOLD_DURATION,
 }: SignaturePadProps) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [isDrawing, setIsDrawing] = useState(false)
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDrawing, setIsDrawing] = useState(false);
   const [lastPosition, setLastPosition] = useState<{
-    x: number
-    y: number
-  } | null>(null)
-  const [hasDrawn, setHasDrawn] = useState(false)
-  const [holdProgress, setHoldProgress] = useState(0)
-  const [isHolding, setIsHolding] = useState(false)
+    x: number;
+    y: number;
+  } | null>(null);
+  const [hasDrawn, setHasDrawn] = useState(false);
+  const [holdProgress, setHoldProgress] = useState(0);
+  const [isHolding, setIsHolding] = useState(false);
 
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const holdTimerRef = useRef<NodeJS.Timeout | null>(null)
-  const holdStartRef = useRef<number | null>(null)
-  const animationFrameRef = useRef<number | null>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const holdTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const holdStartRef = useRef<number | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
 
   // Helper function to get the correct stroke color based on theme
   const getStrokeColor = () => {
-    const isDarkClass = document.documentElement.classList.contains('dark')
-    const isLightClass = document.documentElement.classList.contains('light')
+    const isDarkClass = document.documentElement.classList.contains("dark");
+    const isLightClass = document.documentElement.classList.contains("light");
     const systemPrefersDark = window.matchMedia(
-      '(prefers-color-scheme: dark)',
-    ).matches
+      "(prefers-color-scheme: dark)",
+    ).matches;
 
-    const isDarkMode = isDarkClass || (!isLightClass && systemPrefersDark)
-    return isDarkMode ? '#ffffff' : '#000000'
-  }
+    const isDarkMode = isDarkClass || (!isLightClass && systemPrefersDark);
+    return isDarkMode ? "#ffffff" : "#000000";
+  };
 
   // Setup canvas when dialog opens
   useEffect(() => {
-    if (!isDialogOpen) return
+    if (!isDialogOpen) return;
 
-    const canvas = canvasRef.current
-    if (!canvas) return
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext("2d");
     if (ctx) {
-      ctx.lineWidth = 2
-      ctx.lineCap = 'round'
-      ctx.lineJoin = 'round'
-      ctx.strokeStyle = getStrokeColor()
+      ctx.lineWidth = 2;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = getStrokeColor();
     }
 
     const updateStrokeColor = () => {
-      const ctx = canvas.getContext('2d')
-      if (!ctx) return
-      ctx.strokeStyle = getStrokeColor()
-    }
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.strokeStyle = getStrokeColor();
+    };
 
-    const cleanupTouchScroll = disableTouchScroll(canvas)
+    const cleanupTouchScroll = disableTouchScroll(canvas);
 
-    const observer = new MutationObserver(updateStrokeColor)
+    const observer = new MutationObserver(updateStrokeColor);
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class'],
-    })
+      attributeFilter: ["class"],
+    });
 
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    mediaQuery.addEventListener('change', updateStrokeColor)
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    mediaQuery.addEventListener("change", updateStrokeColor);
 
     return () => {
-      cleanupTouchScroll()
-      observer.disconnect()
-      mediaQuery.removeEventListener('change', updateStrokeColor)
-    }
-  }, [isDialogOpen])
+      cleanupTouchScroll();
+      observer.disconnect();
+      mediaQuery.removeEventListener("change", updateStrokeColor);
+    };
+  }, [isDialogOpen]);
 
   // Reset canvas state when dialog opens
   useEffect(() => {
     if (isDialogOpen) {
-      setHasDrawn(false)
-      setHoldProgress(0)
-      setIsHolding(false)
+      setHasDrawn(false);
+      setHoldProgress(0);
+      setIsHolding(false);
       // Clear canvas on open
-      const canvas = canvasRef.current
-      const ctx = canvas?.getContext('2d')
+      const canvas = canvasRef.current;
+      const ctx = canvas?.getContext("2d");
       if (canvas && ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
       }
     }
-  }, [isDialogOpen])
+  }, [isDialogOpen]);
 
   const startDrawing = (
     e:
       | React.MouseEvent<HTMLCanvasElement>
       | React.TouchEvent<HTMLCanvasElement>,
   ) => {
-    e.preventDefault()
-    setIsDrawing(true)
-    setHasDrawn(true)
-    draw(e)
-  }
+    e.preventDefault();
+    setIsDrawing(true);
+    setHasDrawn(true);
+    draw(e);
+  };
 
   const stopDrawing = () => {
-    if (!isDrawing) return
-    setIsDrawing(false)
-    setLastPosition(null)
-    const canvas = canvasRef.current
-    const ctx = canvas?.getContext('2d')
+    if (!isDrawing) return;
+    setIsDrawing(false);
+    setLastPosition(null);
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
     if (canvas && ctx) {
-      ctx.beginPath()
+      ctx.beginPath();
     }
-  }
+  };
 
   const draw = (
     e:
       | React.MouseEvent<HTMLCanvasElement>
       | React.TouchEvent<HTMLCanvasElement>,
   ) => {
-    e.preventDefault()
-    if (!isDrawing) return
+    e.preventDefault();
+    if (!isDrawing) return;
 
-    const canvas = canvasRef.current
-    const ctx = canvas?.getContext('2d')
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
     if (canvas && ctx) {
       // Ensure correct stroke color before drawing
-      ctx.strokeStyle = getStrokeColor()
-      
-      const rect = canvas.getBoundingClientRect()
-      const scaleX = canvas.width / rect.width
-      const scaleY = canvas.height / rect.height
+      ctx.strokeStyle = getStrokeColor();
+
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
       const x =
-        (('touches' in e ? e.touches[0].clientX : e.clientX) - rect.left) *
-        scaleX
+        (("touches" in e ? e.touches[0].clientX : e.clientX) - rect.left) *
+        scaleX;
       const y =
-        (('touches' in e ? e.touches[0].clientY : e.clientY) - rect.top) *
-        scaleY
+        (("touches" in e ? e.touches[0].clientY : e.clientY) - rect.top) *
+        scaleY;
 
       if (lastPosition) {
-        const midX = (lastPosition.x + x) / 2
-        const midY = (lastPosition.y + y) / 2
+        const midX = (lastPosition.x + x) / 2;
+        const midY = (lastPosition.y + y) / 2;
 
-        ctx.beginPath()
-        ctx.moveTo(lastPosition.x, lastPosition.y)
-        ctx.quadraticCurveTo(midX, midY, x, y)
-        ctx.stroke()
+        ctx.beginPath();
+        ctx.moveTo(lastPosition.x, lastPosition.y);
+        ctx.quadraticCurveTo(midX, midY, x, y);
+        ctx.stroke();
       } else {
-        ctx.beginPath()
-        ctx.moveTo(x, y)
+        ctx.beginPath();
+        ctx.moveTo(x, y);
       }
 
-      setLastPosition({ x, y })
+      setLastPosition({ x, y });
     }
-  }
+  };
 
   const clearSignature = () => {
-    const canvas = canvasRef.current
-    const ctx = canvas?.getContext('2d')
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
     if (canvas && ctx) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      setHasDrawn(false)
-      setHoldProgress(0)
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      setHasDrawn(false);
+      setHoldProgress(0);
     }
-  }
+  };
 
   const updateHoldProgress = useCallback(() => {
-    if (!holdStartRef.current) return
+    if (!holdStartRef.current) return;
 
-    const elapsed = Date.now() - holdStartRef.current
-    const progress = Math.min((elapsed / holdToSignDuration) * 100, 100)
-    setHoldProgress(progress)
+    const elapsed = Date.now() - holdStartRef.current;
+    const progress = Math.min((elapsed / holdToSignDuration) * 100, 100);
+    setHoldProgress(progress);
 
     if (progress < 100) {
-      animationFrameRef.current = requestAnimationFrame(updateHoldProgress)
+      animationFrameRef.current = requestAnimationFrame(updateHoldProgress);
     }
-  }, [holdToSignDuration])
+  }, [holdToSignDuration]);
 
   const handleHoldStart = useCallback(
     (e: React.PointerEvent) => {
-      if (!hasDrawn) return
+      if (!hasDrawn) return;
 
-      e.preventDefault()
-      setIsHolding(true)
-      holdStartRef.current = Date.now()
-      setHoldProgress(0)
+      e.preventDefault();
+      setIsHolding(true);
+      holdStartRef.current = Date.now();
+      setHoldProgress(0);
 
       // Start progress animation
-      animationFrameRef.current = requestAnimationFrame(updateHoldProgress)
+      animationFrameRef.current = requestAnimationFrame(updateHoldProgress);
 
       // Set timer for completion
       holdTimerRef.current = setTimeout(() => {
-        const canvas = canvasRef.current
+        const canvas = canvasRef.current;
         if (canvas) {
-          const dataUrl = canvas.toDataURL('image/png')
-          onChange(dataUrl)
-          setIsDialogOpen(false)
+          const dataUrl = canvas.toDataURL("image/png");
+          onChange(dataUrl);
+          setIsDialogOpen(false);
         }
-        setIsHolding(false)
-        setHoldProgress(0)
-      }, holdToSignDuration)
+        setIsHolding(false);
+        setHoldProgress(0);
+      }, holdToSignDuration);
     },
     [hasDrawn, holdToSignDuration, onChange, updateHoldProgress],
-  )
+  );
 
   const handleHoldEnd = useCallback(() => {
-    setIsHolding(false)
-    holdStartRef.current = null
+    setIsHolding(false);
+    holdStartRef.current = null;
 
     if (holdTimerRef.current) {
-      clearTimeout(holdTimerRef.current)
-      holdTimerRef.current = null
+      clearTimeout(holdTimerRef.current);
+      holdTimerRef.current = null;
     }
 
     if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current)
-      animationFrameRef.current = null
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
     }
 
-    setHoldProgress(0)
-  }, [])
+    setHoldProgress(0);
+  }, []);
 
   const handleClearValue = () => {
-    onChange(null)
-  }
+    onChange(null);
+  };
 
   const handleReset = () => {
-    onChange(null)
-    setIsDialogOpen(false)
-  }
+    onChange(null);
+    setIsDialogOpen(false);
+  };
 
   const handleEditSignature = () => {
-    setIsDialogOpen(true)
-  }
+    setIsDialogOpen(true);
+  };
 
   // Cleanup timers on unmount
   useEffect(() => {
     return () => {
       if (holdTimerRef.current) {
-        clearTimeout(holdTimerRef.current)
+        clearTimeout(holdTimerRef.current);
       }
       if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current)
+        cancelAnimationFrame(animationFrameRef.current);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   // If we have a signature value, show the signature image
   if (value) {
     return (
       <div
         className={cn(
-          'relative inline-flex items-center justify-start mt-2',
+          "relative inline-flex items-center justify-start mt-2",
           className,
         )}
       >
@@ -375,10 +375,10 @@ export default function SignaturePad({
               <Button
                 type="button"
                 className={cn(
-                  'flex-1 relative overflow-hidden transition-all border-2 border-transparent',
+                  "flex-1 relative overflow-hidden transition-all border-2 border-transparent",
                   hasDrawn
-                    ? 'bg-zinc-800 dark:bg-zinc-200 text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-300'
-                    : 'bg-muted text-muted-foreground cursor-not-allowed',
+                    ? "bg-zinc-800 dark:bg-zinc-200 text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-300"
+                    : "bg-muted text-muted-foreground cursor-not-allowed",
                 )}
                 disabled={!hasDrawn}
                 onPointerDown={handleHoldStart}
@@ -392,20 +392,22 @@ export default function SignaturePad({
                   style={{ width: `${holdProgress}%` }}
                 />
                 <span className="relative z-10 flex items-center gap-2">
-                  <Check className={cn('w-4 h-4', isHolding && 'animate-pulse')} />
-                  {isHolding ? 'Keep holding...' : 'Hold to confirm'}
+                  <Check
+                    className={cn("w-4 h-4", isHolding && "animate-pulse")}
+                  />
+                  {isHolding ? "Keep holding..." : "Hold to confirm"}
                 </span>
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
-    )
+    );
   }
 
   // Initial state: show pen button
   return (
-    <div className={cn('inline-flex mt-2', className)}>
+    <div className={cn("inline-flex mt-2", className)}>
       <Button
         type="button"
         size="icon"
@@ -458,10 +460,10 @@ export default function SignaturePad({
             <Button
               type="button"
               className={cn(
-                'flex-1 relative overflow-hidden transition-all border-2 border-transparent',
+                "flex-1 relative overflow-hidden transition-all border-2 border-transparent",
                 hasDrawn
-                  ? 'bg-zinc-800 dark:bg-zinc-200 text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-300'
-                  : 'bg-muted text-muted-foreground cursor-not-allowed',
+                  ? "bg-zinc-800 dark:bg-zinc-200 text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-300"
+                  : "bg-muted text-muted-foreground cursor-not-allowed",
               )}
               disabled={!hasDrawn}
               onPointerDown={handleHoldStart}
@@ -475,13 +477,15 @@ export default function SignaturePad({
                 style={{ width: `${holdProgress}%` }}
               />
               <span className="relative z-10 flex items-center gap-2">
-                <Check className={cn('w-4 h-4', isHolding && 'animate-pulse')} />
-                {isHolding ? 'Keep holding...' : 'Hold to confirm'}
+                <Check
+                  className={cn("w-4 h-4", isHolding && "animate-pulse")}
+                />
+                {isHolding ? "Keep holding..." : "Hold to confirm"}
               </span>
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import * as Locales from "date-fns/locale";
+import type * as Locales from "date-fns/locale";
 
 export type FormFieldType = {
   type: string;

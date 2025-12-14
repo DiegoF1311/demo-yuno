@@ -1,9 +1,10 @@
 "use client";
 
-import * as React from "react";
-import { useState, useRef, useEffect } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { CreditCard as CreditCardIcon, Lock } from "lucide-react";
+import type * as React from "react";
+import { useEffect, useRef, useState } from "react";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -12,8 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card } from "@/components/ui/card";
-import { CreditCard as CreditCardIcon, Lock } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // Enhanced Card vendor SVG icons with better styling
 const CardIcons = {

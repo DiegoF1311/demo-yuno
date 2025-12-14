@@ -1,26 +1,26 @@
-import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
-import { js_beautify } from 'js-beautify'
+import { type ClassValue, clsx } from "clsx";
+import { js_beautify } from "js-beautify";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export const sentenceCase = (str: string): string => {
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
-}
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
 
 export const lowerCase = (str: string): string => {
-  return str.charAt(0).toLowerCase() + str.slice(1).toLowerCase()
-}
+  return str.charAt(0).toLowerCase() + str.slice(1).toLowerCase();
+};
 
 export const isNotEmpty = (value: string | undefined) =>
-  value!.trim().length > 0
+  value!.trim().length > 0;
 
 export function formatJSXCode(code: string): string {
   return js_beautify(code, {
     indent_size: 2,
-    indent_char: ' ',
+    indent_char: " ",
     max_preserve_newlines: 2,
     preserve_newlines: true,
     keep_array_indentation: false,
@@ -36,5 +36,5 @@ export function formatJSXCode(code: string): string {
     comma_first: false,
     e4x: true,
     indent_empty_lines: false,
-  })
+  });
 }

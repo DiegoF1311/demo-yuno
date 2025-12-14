@@ -1,12 +1,11 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { Trash2 as RemoveIcon } from "lucide-react";
 import {
-  Dispatch,
-  SetStateAction,
   createContext,
+  type Dispatch,
   forwardRef,
+  type SetStateAction,
   useCallback,
   useContext,
   useEffect,
@@ -14,14 +13,15 @@ import {
   useState,
 } from "react";
 import {
+  type DropzoneOptions,
+  type DropzoneState,
+  type FileRejection,
   useDropzone,
-  DropzoneState,
-  FileRejection,
-  DropzoneOptions,
 } from "react-dropzone";
 import { toast } from "sonner";
-import { Trash2 as RemoveIcon } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 type DirectionOptions = "rtl" | "ltr" | undefined;
 

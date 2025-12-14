@@ -1,13 +1,12 @@
-import { z, ZodTypeAny } from "zod";
-import { FormFieldType } from "@/types";
-import { FormLibrary, FORM_LIBRARIES } from "@/constants";
-import { generateFormJsonSchema } from "@/lib/json-schema-generator";
-
+import { type ZodTypeAny, z } from "zod";
 import { generateCodeSnippet } from "@/components/screens/generate-code-field";
-import { generateServerActionsCode } from "./server-actions";
-import { generateReactHookFormCode } from "./react-hook-form";
-import { generateTanStackFormCode } from "./tanstack-form";
+import { FORM_LIBRARIES, type FormLibrary } from "@/constants";
+import { generateFormJsonSchema } from "@/lib/json-schema-generator";
+import type { FormFieldType } from "@/types";
 import { generateBringYourOwnCode } from "./bring-your-own";
+import { generateReactHookFormCode } from "./react-hook-form";
+import { generateServerActionsCode } from "./server-actions";
+import { generateTanStackFormCode } from "./tanstack-form";
 
 type FormFieldOrGroup = FormFieldType | FormFieldType[];
 

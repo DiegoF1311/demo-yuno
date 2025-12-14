@@ -1,33 +1,33 @@
-import React, { useState, useEffect } from 'react'
-import * as Locales from 'date-fns/locale'
-
+import * as Locales from "date-fns/locale";
+import type React from "react";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox'
-import { FormFieldType } from '@/types'
-import If from '@/components/ui/if'
+} from "@/components/ui/dialog";
+import If from "@/components/ui/if";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
-} from '@/components/ui/select' // Import Select components
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"; // Import Select components
+import type { FormFieldType } from "@/types";
 
 type EditFieldDialogProps = {
-  isOpen: boolean
-  onClose: () => void
-  field: FormFieldType | null
-  onSave: (updatedField: FormFieldType) => void
-}
+  isOpen: boolean;
+  onClose: () => void;
+  field: FormFieldType | null;
+  onSave: (updatedField: FormFieldType) => void;
+};
 
 export const EditFieldDialog: React.FC<EditFieldDialogProps> = ({
   isOpen,
@@ -35,21 +35,21 @@ export const EditFieldDialog: React.FC<EditFieldDialogProps> = ({
   field,
   onSave,
 }) => {
-  const [editedField, setEditedField] = useState<FormFieldType | null>(null)
-  const [fieldType, setFieldType] = useState<string>()
+  const [editedField, setEditedField] = useState<FormFieldType | null>(null);
+  const [fieldType, setFieldType] = useState<string>();
 
   useEffect(() => {
-    setEditedField(field)
-  }, [field])
+    setEditedField(field);
+  }, [field]);
 
   const handleSave = () => {
     if (editedField) {
-      onSave(editedField)
-      onClose()
+      onSave(editedField);
+      onClose();
     }
-  }
+  };
 
-  if (!editedField) return null
+  if (!editedField) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -110,7 +110,7 @@ export const EditFieldDialog: React.FC<EditFieldDialogProps> = ({
             />
           </div>
           <If
-            condition={field?.variant === 'Input'}
+            condition={field?.variant === "Input"}
             render={() => (
               <div>
                 <Label htmlFor="type">Type</Label>
@@ -118,8 +118,8 @@ export const EditFieldDialog: React.FC<EditFieldDialogProps> = ({
                   // id="type"
                   value={editedField.type}
                   onValueChange={(value) => {
-                    setFieldType(value)
-                    setEditedField({ ...editedField, type: value })
+                    setFieldType(value);
+                    setEditedField({ ...editedField, type: value });
                   }}
                 >
                   <SelectTrigger>
@@ -136,7 +136,7 @@ export const EditFieldDialog: React.FC<EditFieldDialogProps> = ({
             )}
           />
           <If
-            condition={fieldType === 'number' || fieldType === 'text'}
+            condition={fieldType === "number" || fieldType === "text"}
             render={() => (
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-1 flex flex-col gap-1 ">
@@ -171,7 +171,7 @@ export const EditFieldDialog: React.FC<EditFieldDialogProps> = ({
             )}
           />
           <If
-            condition={field?.variant === 'Slider'}
+            condition={field?.variant === "Slider"}
             render={() => (
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-1 flex flex-col gap-1 ">
@@ -220,19 +220,19 @@ export const EditFieldDialog: React.FC<EditFieldDialogProps> = ({
             )}
           />
           <If
-            condition={field?.variant === 'Smart Datetime Input'}
+            condition={field?.variant === "Smart Datetime Input"}
             render={() => (
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-1 flex flex-col gap-1 ">
                   <Label htmlFor="locale">Locale</Label>
                   <Select
                     // id="locale"
-                    value={editedField.locale ?? ''}
+                    value={editedField.locale ?? ""}
                     onValueChange={(value) => {
                       setEditedField({
                         ...editedField,
                         locale: value as keyof typeof Locales,
-                      })
+                      });
                     }}
                   >
                     <SelectTrigger>
@@ -295,5 +295,5 @@ export const EditFieldDialog: React.FC<EditFieldDialogProps> = ({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
