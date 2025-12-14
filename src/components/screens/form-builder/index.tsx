@@ -3,7 +3,6 @@
 import Link from "next";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-// import EmptyListSvg from "@/assets/oc-thinking.svg";
 import Editor from "@/components/editor/editor";
 import { EditFieldDialog } from "@/components/screens/edit-field-dialog";
 // import SpecialComponentsNotice from '@/components/playground/special-component-notice'
@@ -174,7 +173,13 @@ export default function FormBuilder() {
                 addFormField(variant, index)
               }
             />
-            {/*<EmptyListSvg className="mx-auto" />*/}
+            <Image
+              src="oc-thinking.svg"
+              alt="Empty list"
+              width={200}
+              height={200}
+              className="mx-auto"
+            />
           </div>
         )}
       />

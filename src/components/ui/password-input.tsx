@@ -1,10 +1,12 @@
 "use client";
 
-import { forwardRef, useState } from "react";
+import { forwardRef, useState, InputHTMLAttributes } from "react";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
-import { Input, InputProps } from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+
+type InputProps = InputHTMLAttributes<HTMLInputElement>;
 
 const PasswordInput = forwardRef<HTMLInputElement, InputProps>(
   ({ className, ...props }, ref) => {

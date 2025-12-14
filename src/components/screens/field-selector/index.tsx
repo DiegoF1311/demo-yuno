@@ -28,7 +28,7 @@ export const FieldSelector: React.FC<FieldSelectorProps> = ({
               condition={variant.isNew}
               render={() => (
                 <Badge
-                  variant={"new"}
+                  variant={"outline"}
                   className="md:hidden ml-1 p-1 text-[10px]"
                 >
                   New
@@ -40,7 +40,7 @@ export const FieldSelector: React.FC<FieldSelectorProps> = ({
             condition={variant.isNew}
             render={() => (
               <Badge
-                variant={"new"}
+                variant={"outline"}
                 className="hidden md:block ml-1 p-1 text-[10px]"
               >
                 New

@@ -70,7 +70,7 @@ const renderFormFields = (fields: FormFieldOrGroup[], form: any) => {
                 >
                   <FormControl>
                     {React.cloneElement(
-                      renderFormField(field, form) as React.ReactElement,
+                      renderFormField(field) as React.ReactElement,
                       {
                         ...formField,
                       },
@@ -92,7 +92,7 @@ const renderFormFields = (fields: FormFieldOrGroup[], form: any) => {
             <FormItem className="col-span-12">
               <FormControl>
                 {React.cloneElement(
-                  renderFormField(fieldOrGroup, form) as React.ReactElement,
+                  renderFormField(fieldOrGroup) as React.ReactElement,
                   {
                     ...formField,
                   },

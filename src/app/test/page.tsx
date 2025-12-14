@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -15,38 +15,22 @@ import {
 } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import type { FormFieldType } from "@/types";
+import { ColorPickerFormDemo } from "@/components/theme-picker";
+
+const STORAGE_KEY = "local-theme-config";
 
 export default function Page() {
+  const [themeVars, setThemeVars] = useState<Record<string, string>>({});
+
+  const saveTheme = (newVars: Record<string, string>) => {
+    setThemeVars(newVars);
+  };
+
   useEffect(() => {
-    const root = document.documentElement;
-
-    // Ejemplo 1: Rojo
-    root.style.setProperty("--primary", "#ef4444");
-    root.style.setProperty("--primary-foreground", "#ffffff");
-    root.style.setProperty("--border", "#fca5a5");
-    root.style.setProperty("--background", "#fef2f2");
-    root.style.setProperty("--input", "#fca5a5");
-    root.style.setProperty("--ring", "#ffffff");
-
-    // Para cambiar, descomenta otro ejemplo:
-
-    // Ejemplo 2: Azul
-    // root.style.setProperty("--primary", "#3b82f6");
-    // root.style.setProperty("--primary-foreground", "#ffffff");
-    // root.style.setProperty("--border", "#bfdbfe");
-    // root.style.setProperty("--background", "#eff6ff");
-
-    // Ejemplo 3: Verde
-    // root.style.setProperty("--primary", "#10b981");
-    // root.style.setProperty("--primary-foreground", "#ffffff");
-    // root.style.setProperty("--border", "#a7f3d0");
-    // root.style.setProperty("--background", "#f0fdf4");
-
-    // Ejemplo 4: Púrpura
-    // root.style.setProperty("--primary", "#8b5cf6");
-    // root.style.setProperty("--primary-foreground", "#ffffff");
-    // root.style.setProperty("--border", "#ddd6fe");
-    // root.style.setProperty("--background", "#faf5ff");
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      setThemeVars(JSON.parse(saved));
+    }
   }, []);
 
   const formFields: FormFieldType[] = [
@@ -62,6 +46,9 @@ export default function Page() {
       type: "",
       value: "",
       variant: "Input",
+      setValue: () => {},
+      onChange: () => {},
+      onSelect: () => {},
     },
     {
       checked: true,
@@ -75,6 +62,9 @@ export default function Page() {
       type: "",
       value: "",
       variant: "Credit Card",
+      setValue: () => {},
+      onChange: () => {},
+      onSelect: () => {},
     },
   ];
 
@@ -87,28 +77,31 @@ export default function Page() {
   });
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Formulario</CardTitle>
-          <CardDescription>Completa los campos requeridos</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit((data) => console.log(data))}
-              className="space-y-4"
-            >
-              {formFields.map((field) => (
-                <div key={field.name}>{renderFormField(field, form)}</div>
-              ))}
-              <Button type="submit" className="w-full">
-                Submit
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+    <div className="flex items-center justify-center min-h-screen gap-4">
+      <ColorPickerFormDemo onSave={saveTheme} />
+      <div style={themeVars as React.CSSProperties}>
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Formulario</CardTitle>
+            <CardDescription>Completa los campos requeridos</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit((data) => console.log(data))}
+                className="space-y-4"
+              >
+                {formFields.map((field) => (
+                  <div key={field.name}>{renderFormField(field)}</div>
+                ))}
+                <Button type="submit" className="w-full">
+                  Submit
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

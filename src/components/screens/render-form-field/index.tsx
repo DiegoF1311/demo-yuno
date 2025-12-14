@@ -71,7 +71,7 @@ const states = [
 
 export const renderFormField = (field: FormFieldType) => {
   const [value, setValue] = useState(field.value || "");
-  const [checked, setChecked] = useState(field.checked || false);
+  const [checked, setChecked] = useState<boolean>(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<string>("");
   const [selectedValues, setSelectedValues] = useState<string[]>(
@@ -81,13 +81,20 @@ export const renderFormField = (field: FormFieldType) => {
     field.value instanceof Date ? field.value : undefined,
   );
   const [otp, setOtp] = useState("");
-  const [creditCard, setCreditCard] = useState({
+  const [creditCard, setCreditCard] = useState<{
+    cardholderName: string;
+    cardNumber: string;
+    expiryMonth: string;
+    expiryYear: string;
+    cvv: string;
+  }>({
     cardholderName: "",
     cardNumber: "",
     expiryMonth: "",
     expiryYear: "",
     cvv: "",
   });
+
   const [paypalEmail, setPaypalEmail] = useState("");
   const [applePayData, setApplePayData] = useState({
     token: "",
@@ -99,9 +106,11 @@ export const renderFormField = (field: FormFieldType) => {
   });
   const [openCombobox, setOpenCombobox] = useState(false);
 
-  const handleChange = (newValue: string | boolean | Date | string[]) => {
-    setValue(newValue);
-    field.onChange(newValue);
+  const handleChange = (value: string | boolean | Date | string[]) => {
+    if (typeof value === "boolean" && value === false) {
+      return;
+    }
+    setValue(value as string | number | true | Date | string[]);
   };
 
   const handleMultiSelect = (selectedValue: string) => {
@@ -115,19 +124,16 @@ export const renderFormField = (field: FormFieldType) => {
   const handleCardChange = (fieldName: string, fieldValue: string) => {
     const updated = { ...creditCard, [fieldName]: fieldValue };
     setCreditCard(updated);
-    field.onChange(updated);
   };
 
   const handleApplePayChange = (fieldName: string, fieldValue: string) => {
     const updated = { ...applePayData, [fieldName]: fieldValue };
     setApplePayData(updated);
-    field.onChange(updated);
   };
 
   const handleGooglePayChange = (fieldName: string, fieldValue: string) => {
     const updated = { ...googlePayData, [fieldName]: fieldValue };
     setGooglePayData(updated);
-    field.onChange(updated);
   };
 
   const formatCardNumber = (num: string) => {
@@ -145,7 +151,13 @@ export const renderFormField = (field: FormFieldType) => {
           <Input
             id={field.name}
             placeholder={field.placeholder}
-            value={value}
+            value={
+              typeof value === "string"
+                ? value
+                : typeof value === "number"
+                  ? value
+                  : ""
+            }
             onChange={(e) => handleChange(e.target.value)}
             disabled={field.disabled}
             required={field.required}
@@ -163,7 +175,13 @@ export const renderFormField = (field: FormFieldType) => {
           <Input
             id={field.name}
             placeholder={field.placeholder || "email@example.com"}
-            value={value}
+            value={
+              typeof value === "string"
+                ? value
+                : typeof value === "number"
+                  ? value
+                  : ""
+            }
             onChange={(e) => handleChange(e.target.value)}
             disabled={field.disabled}
             required={field.required}
@@ -182,7 +200,13 @@ export const renderFormField = (field: FormFieldType) => {
           <Input
             id={field.name}
             placeholder={field.placeholder || "+1 (555) 000-0000"}
-            value={value}
+            value={
+              typeof value === "string"
+                ? value
+                : typeof value === "number"
+                  ? value
+                  : ""
+            }
             onChange={(e) => handleChange(e.target.value)}
             disabled={field.disabled}
             required={field.required}
@@ -754,7 +778,13 @@ export const renderFormField = (field: FormFieldType) => {
           <Textarea
             id={field.name}
             placeholder={field.placeholder}
-            value={value}
+            value={
+              typeof value === "string"
+                ? value
+                : typeof value === "number"
+                  ? value
+                  : ""
+            }
             onChange={(e) => handleChange(e.target.value)}
             disabled={field.disabled}
             required={field.required}
@@ -850,7 +880,9 @@ export const renderFormField = (field: FormFieldType) => {
                 className="w-full justify-between"
                 disabled={field.disabled}
               >
-                {value || field.placeholder}
+                {typeof value === "string"
+                  ? value || field.placeholder
+                  : field.placeholder}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-full p-0">
@@ -888,7 +920,13 @@ export const renderFormField = (field: FormFieldType) => {
             <Input
               id={field.name}
               placeholder={field.placeholder || "Enter code"}
-              value={value}
+              value={
+                typeof value === "string"
+                  ? value
+                  : typeof value === "number"
+                    ? value
+                    : ""
+              }
               onChange={(e) => handleChange(e.target.value)}
               disabled={field.disabled}
               className="flex-1"
@@ -912,7 +950,13 @@ export const renderFormField = (field: FormFieldType) => {
             <Input
               id={field.name}
               placeholder={field.placeholder || "0.00"}
-              value={value}
+              value={
+                typeof value === "string"
+                  ? value
+                  : typeof value === "number"
+                    ? value
+                    : ""
+              }
               onChange={(e) => handleChange(e.target.value)}
               disabled={field.disabled}
               required={field.required}
