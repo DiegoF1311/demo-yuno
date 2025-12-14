@@ -9,6 +9,7 @@ import {
 } from "ai";
 import { z } from "zod";
 import { getDevServer } from "@/actions/dev-server";
+import { docsYunoSdkDemo } from "./doc";
 
 const firecrawl = new Firecrawl({ apiKey: process.env.FIRECRAWL_API_KEY! });
 
@@ -134,6 +135,7 @@ export async function POST(req: Request) {
     system:
       "You are an AI App CheckOuts Builder. Generate CheckOuts ui. The existing app is in the /template directory. Please edit the app how the user wants and commit the changes incrementally." +
       "Try to avoid generate multiple componets, try to use only page.tsx",
+    // + docsYunoSdkDemo,
     messages: convertToModelMessages(messages),
     tools,
     abortSignal: AbortSignal.timeout(120000),
