@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "module": "esnext",
+    "target": "es2020"
+  }
+}

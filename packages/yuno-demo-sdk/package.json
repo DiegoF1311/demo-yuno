@@ -2,10 +2,10 @@
   "name": "yuno-demo-sdk-core",
   "version": "0.1.0",
   "description": "Yuno core Sdk",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
   "type": "module",
   "files": [
-    "src/index.ts"
+    "dist"
   ],
   "publishConfig": {
     "access": "public"
