@@ -198,9 +198,9 @@ export function NavigationMenuDemo() {
       </NavigationMenu>
 
       <div className="flex items-center gap-2">
-        <Button variant="outline">Button 1</Button>
-        <Button variant="outline">Button 2</Button>
-        <Button variant="outline">Button 3</Button>
+        <Button variant="outline">Checkout builder</Button>
+        <Button variant="outline">Ai Builder</Button>
+        <Button variant="default">Full AI Builder</Button>
         <ModeToggle />
       </div>
     </div>

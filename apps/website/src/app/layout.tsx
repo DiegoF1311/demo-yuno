@@ -36,7 +36,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <NavigationMenuDemo />
+          <div className="relative z-50">
+            <NavigationMenuDemo />
+          </div>
           {children}
           <Toaster />
         </ThemeProvider>
