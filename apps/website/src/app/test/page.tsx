@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { renderFormField } from "@/components/screens/render-form-field";
+import { RenderFormField } from "@/components/screens/render-form-field";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,6 +21,8 @@ const STORAGE_KEY = "local-theme-config";
 
 export default function Page() {
   const [themeVars, setThemeVars] = useState<Record<string, string>>({});
+  const [apiResponse, setApiResponse] = useState<string>("");
+  const [formFields, setFormFields] = useState<FormFieldType[]>([]);
 
   const saveTheme = (newVars: Record<string, string>) => {
     setThemeVars(newVars);
@@ -31,42 +33,23 @@ export default function Page() {
     if (saved) {
       setThemeVars(JSON.parse(saved));
     }
+    handleApiRequest(); // Fetch form fields on mount
   }, []);
 
-  const formFields: FormFieldType[] = [
-    {
-      checked: true,
-      description: "Enter your full name.",
-      disabled: false,
-      label: "Full Name",
-      name: "name_7039650367",
-      placeholder: "John Doe",
-      required: true,
-      rowIndex: 0,
-      type: "",
-      value: "",
-      variant: "Input",
-      setValue: () => {},
-      onChange: () => {},
-      onSelect: () => {},
-    },
-    {
-      checked: true,
-      description: "Enter your credit card information.",
-      disabled: false,
-      label: "Card Details",
-      name: "name_2917242264",
-      placeholder: "Placeholder",
-      required: true,
-      rowIndex: 0,
-      type: "",
-      value: "",
-      variant: "Credit Card",
-      setValue: () => {},
-      onChange: () => {},
-      onSelect: () => {},
-    },
-  ];
+  const handleApiRequest = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/api/payments/style");
+      const data = await response.json();
+      setApiResponse(JSON.stringify(data, null, 2));
+      if (Array.isArray(data)) {
+        setFormFields(data);
+      } else {
+        console.error("API response is not an array");
+      }
+    } catch (error) {
+      setApiResponse(`Error: ${error}`);
+    }
+  };
 
   const schema = z.object({
     email: z.string().email(),
@@ -92,7 +75,7 @@ export default function Page() {
                 className="space-y-4"
               >
                 {formFields.map((field) => (
-                  <div key={field.name}>{renderFormField(field)}</div>
+                  <RenderFormField key={field.name} field={field} />
                 ))}
                 <Button type="submit" className="w-full">
                   Submit

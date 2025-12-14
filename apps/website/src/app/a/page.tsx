@@ -1,51 +1,92 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { RenderFormField } from "@/components/screens/render-form-field";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Form } from "@/components/ui/form";
+import type { FormFieldType } from "@/types";
+import { ColorPickerFormDemo } from "@/components/theme-picker";
+import { Yuno } from "yuno-demo-sdk";
+
+const STORAGE_KEY = "local-theme-config";
 
 export default function CheckoutPage() {
-  // JSON que viene de tu checkout builder
-  const schema = {
-    theme: {
-      primaryColor: "#7C3AED",
-      radius: 12,
-    },
-    fields: [
-      { type: "text", label: "Full name" },
-      { type: "card", label: "Card number" },
-    ],
+  const [themeVars, setThemeVars] = useState<Record<string, string>>({});
+  const [formFields, setFormFields] = useState<FormFieldType[]>([]);
+
+  const saveTheme = (newVars: Record<string, string>) => {
+    setThemeVars(newVars);
   };
 
-  // Escuchar el "token" que envía el iframe
   useEffect(() => {
-    function onMessage(event: MessageEvent) {
-      if (event.data?.type === "PAYMENT_TOKEN") {
-        console.log("Token recibido:", event.data.token);
-
-        // aquí normalmente llamarías a tu backend
-        // fetch("/api/pay", { method: "POST", body: JSON.stringify({ token }) })
-      }
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      setThemeVars(JSON.parse(saved));
     }
 
-    window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
+    // Listen for the Yuno SDK event
+    const handleYunoFormReady = (event: CustomEvent) => {
+      const { formFields: fields } = event.detail;
+      if (Array.isArray(fields)) {
+        setFormFields(fields);
+      }
+    };
+
+    window.addEventListener('yunoFormReady', handleYunoFormReady as EventListener);
+
+    // Initialize Yuno SDK
+    Yuno.render('yuno-checkout', 'demo-public-key');
+
+    return () => {
+      window.removeEventListener('yunoFormReady', handleYunoFormReady as EventListener);
+    };
   }, []);
 
-  // Pasamos el schema al iframe (simple)
-  const iframeUrl =
-    "http://localhost:3001/checkout" +
-    "?schema=" +
-    encodeURIComponent(JSON.stringify(schema));
+  const schema = z.object({
+    email: z.string().email(),
+  });
+
+  const form = useForm({
+    resolver: zodResolver(schema),
+  });
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md bg-white p-6 rounded-xl shadow">
-        <h1 className="text-xl font-semibold mb-4">Checkout</h1>
-
-        {/* 👇 AQUÍ SE INCRUSTA EL IFRAME */}
-        <iframe src={iframeUrl} className="w-full h-[320px] border rounded" />
-
-        <p className="text-xs text-gray-500 mt-2">Payment handled securely</p>
+    <div className="flex items-center justify-center min-h-screen gap-4">
+      <ColorPickerFormDemo onSave={saveTheme} />
+      <div style={themeVars as React.CSSProperties}>
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Checkout</CardTitle>
+            <CardDescription>Complete your payment</CardDescription>
+          </CardHeader>
+          <CardContent id="yuno-checkout">
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit((data) => console.log(data))}
+                className="space-y-4"
+              >
+                {formFields.map((field) => (
+                  <RenderFormField key={field.name} field={field} />
+                ))}
+                <Button type="submit" className="w-full">
+                  Pay Now
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
+}
 }

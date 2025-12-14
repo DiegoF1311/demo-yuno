@@ -14,6 +14,9 @@ import java.util.UUID;
 @Tag(name = "Payment", description = "Payment Management API")
 public class PaymentController {
 
+    // In-memory storage for the style JSON
+    private String savedStyleJson = null;
+
     @Operation(summary = "Start a payment", description = "Initiates a new payment process")
     @PostMapping("/start")
     public StartPaymentResponse startPayment(@RequestBody StartPaymentRequest request) {
@@ -38,11 +41,24 @@ public class PaymentController {
 
     @Operation(summary = "Get payment style", description = "Retrieves the styling configuration for the payment interface")
     @GetMapping("/style")
-    public StyleResponse getStyle() {
-        // Mock logic
-        Map<String, String> styles = new HashMap<>();
-        styles.put("borderRadius", "5px");
-        styles.put("fontFamily", "Arial, sans-serif");
-        return new StyleResponse("light", "#007bff", styles);
+    @ResponseBody
+    public String getStyle() {
+        // Return saved JSON or empty array if nothing saved
+        if (savedStyleJson != null) {
+            return savedStyleJson;
+        }
+        return "[]";
+    }
+
+    @Operation(summary = "Save payment style", description = "Saves the styling configuration for the payment interface")
+    @PostMapping("/style")
+    public Map<String, Object> saveStyle(@RequestBody String styleJson) {
+        // Save the JSON string
+        savedStyleJson = styleJson;
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "Style saved successfully");
+        return response;
     }
 }

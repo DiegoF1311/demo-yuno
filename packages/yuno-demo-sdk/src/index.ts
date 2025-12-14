@@ -189,3 +189,39 @@ export const checkStatus = async (paymentId: string, options?: RequestInit): Pro
   const data: checkStatusResponse['data'] = body ? JSON.parse(body) : {}
   return { data, status: res.status, headers: res.headers } as checkStatusResponse
 }
+
+/**
+ * Render the payment form with the style configuration
+ * @summary Render payment form
+ */
+export interface YunoSDK {
+  render: (containerId: string, publicKey: string) => Promise<void>;
+}
+
+export const Yuno: YunoSDK = {
+  render: async (containerId: string, publicKey: string) => {
+    try {
+      const response = await getStyle(publicKey);
+      const formFields = response.data;
+      
+      const container = document.getElementById(containerId);
+      if (!container) {
+        throw new Error(`Container with id "${containerId}" not found`);
+      }
+      
+      // This will be implemented by the integrator using React
+      // For now, we just store the data in a data attribute
+      container.setAttribute('data-form-fields', JSON.stringify(formFields));
+      container.setAttribute('data-public-key', publicKey);
+      
+      // Dispatch a custom event that the React app can listen to
+      const event = new CustomEvent('yunoFormReady', {
+        detail: { formFields, publicKey }
+      });
+      window.dispatchEvent(event);
+    } catch (error) {
+      console.error('Error rendering Yuno form:', error);
+      throw error;
+    }
+  }
+};
