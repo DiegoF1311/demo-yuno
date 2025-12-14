@@ -8,6 +8,7 @@ import {
 } from "ai";
 import { z } from "zod";
 import { getDevServer } from "@/actions/dev-server";
+import { scrapeTool } from "firecrawl-aisdk";
 
 export type ChatMessage = UIMessage;
 
@@ -21,6 +22,7 @@ export async function POST(req: Request) {
   const devServer = await getDevServer(repoId);
 
   const tools = {
+    scrapeTool,
     readFile: tool({
       description: "Read a file from the dev server",
       inputSchema: z.object({
@@ -116,10 +118,7 @@ export async function POST(req: Request) {
     model: anthropic("claude-haiku-4-5"),
     maxRetries: 2,
     system:
-      "You are an API builder with HonoJs + @hono/zod-openapi. Edit the API in /template as requested. Read the readme first. Only make necessary changes. " +
-      "The server always runs in dev, do not execute dev commands. " +
-      "Do not use markdown code blocks in your responses. " +
-      "IMPORTANT: After writing or editing any code file, ALWAYS run the 'lint' tool to validate that the code is correct.",
+      "You are an AI App Builder. The existing app is in the /template directory. Please edit the app how the user wants and commit the changes incrementally.",
     messages: convertToModelMessages(messages),
     tools,
     abortSignal: AbortSignal.timeout(120000),
